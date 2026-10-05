@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Menu | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .menu-filter-bar {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .filter-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            width: 100%;
+        }
+        .category-tab {
+            padding: 8px 16px;
+            background-color: #fafbfe;
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+        .category-tab.active, .category-tab:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .search-box {
+            display: flex;
+            flex-grow: 1;
+            max-width: 400px;
+            position: relative;
+        }
+        .search-box input {
+            padding-right: 40px;
+        }
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .menu-card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: var(--transition);
+        }
+        .menu-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .menu-card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .menu-card-details {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .menu-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        .badge-veg { background-color: rgba(46, 213, 115, 0.15); color: #2ed573; }
+        .badge-nonveg { background-color: rgba(255, 71, 87, 0.15); color: #ff4757; }
+        .sold-out-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .sold-out-badge {
+            background-color: var(--secondary);
+            color: white;
+            padding: 8px 16px;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: var(--radius-sm);
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-gauge"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="menu.html" class="sidebar-link">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                        <span>Digital Menu</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="reservation.html" class="sidebar-link">
+                        <i class="fa-solid fa-chair"></i>
+                        <span>Book Table</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="cart.html" class="sidebar-link">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span>Active Cart</span>
+                        <span id="sidebar-cart-badge" class="badge badge-danger" style="margin-left: auto; display: none;">0</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Track Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="profile.html" class="sidebar-link">
+                        <i class="fa-solid fa-user-gear"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Digital Menu</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Premium Guest</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Filter control deck -->
+                <div class="menu-filter-bar">
+                    <!-- Categories -->
+                    <div class="category-tabs" id="category-tabs-container">
+                        <span class="category-tab active" onclick="setCategory('All')">All Categories</span>
+                        <span class="category-tab" onclick="setCategory('Starters')">Starters</span>
+                        <span class="category-tab" onclick="setCategory('Main Course')">Main Course</span>
+                        <span class="category-tab" onclick="setCategory('Biryani')">Biryani</span>
+                        <span class="category-tab" onclick="setCategory('Fast Foods')">Fast Foods</span>
+                        <span class="category-tab" onclick="setCategory('Desserts')">Desserts</span>
+                        <span class="category-tab" onclick="setCategory('Beverages')">Beverages</span>
+                    </div>
+
+                    <!-- Search and filters -->
+                    <div class="filter-row">
+                        <div class="search-box">
+                            <input type="text" id="search-input" class="form-control" placeholder="Search for dishes..." oninput="handleFiltersChange()">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+
+                        <div class="flex align-center" style="gap: 16px; flex-wrap: wrap;">
+                            <!-- Diet preferences -->
+                            <div class="flex align-center" style="gap: 10px;">
+                                <label class="flex align-center" style="gap: 6px; font-weight:550; font-size:14px; cursor:pointer;">
+                                    <input type="checkbox" id="filter-veg" onchange="handleFiltersChange()" style="accent-color: var(--success); width:16px; height:16px;"> Veg Only
+                                </label>
+                                <label class="flex align-center" style="gap: 6px; font-weight:550; font-size:14px; cursor:pointer;">
+                                    <input type="checkbox" id="filter-nonveg" onchange="handleFiltersChange()" style="accent-color: var(--danger); width:16px; height:16px;"> Non-Veg Only
+                                </label>
+                            </div>
+
+                            <!-- Sorting -->
+                            <select id="sort-select" class="form-control" onchange="handleFiltersChange()" style="width: 180px;">
+                                <option value="rating">Popularity (Rating)</option>
+                                <option value="low-high">Price: Low to High</option>
+                                <option value="high-low">Price: High to Low</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dishes Grid -->
+                <div class="menu-grid" id="menu-grid-container">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        const currentUser = checkAccess(['customer']);
+        let selectedCategory = 'All';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            loadMenu();
+            updateCartBadge();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                loadMenu();
+            });
+        });
+
+        function loadMenu() {
+            const menu = dbGet('menuItems');
+            const container = document.getElementById('menu-grid-container');
+            container.innerHTML = '';
+
+            // 1. Filter by category
+            let filtered = [...menu];
+            if (selectedCategory !== 'All') {
+                filtered = filtered.filter(item => item.category === selectedCategory);
+            }
+
+            // 2. Filter by search
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            if (query) {
+                filtered = filtered.filter(item => 
+                    item.name.toLowerCase().includes(query) || 
+                    item.description.toLowerCase().includes(query)
+                );
+            }
+
+            // 3. Filter by Veg/Non-Veg
+            const vegOnly = document.getElementById('filter-veg').checked;
+            const nonVegOnly = document.getElementById('filter-nonveg').checked;
+
+            if (vegOnly && !nonVegOnly) {
+                filtered = filtered.filter(item => item.isVeg);
+            } else if (nonVegOnly && !vegOnly) {
+                filtered = filtered.filter(item => !item.isVeg);
+            }
+
+            // 4. Sort
+            const sortVal = document.getElementById('sort-select').value;
+            if (sortVal === 'low-high') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (sortVal === 'high-low') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortVal === 'rating') {
+                filtered.sort((a, b) => b.rating - a.rating);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-muted);">
+                        <i class="fa-solid fa-face-frown" style="font-size: 40px; margin-bottom: 12px;"></i>
+                        <p>No dishes found matching your selection.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(dish => {
+                const card = document.createElement('div');
+                card.className = 'menu-card';
+
+                let overlayHtml = '';
+                if (!dish.available) {
+                    overlayHtml = `
+                        <div class="sold-out-overlay">
+                            <span class="sold-out-badge">Sold Out</span>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    ${overlayHtml}
+                    <img src="${dish.image}" class="menu-card-img" alt="${dish.name}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80';">
+                    <div class="menu-card-details">
+                        <span class="menu-badge ${dish.isVeg ? 'badge-veg' : 'badge-nonveg'}">${dish.isVeg ? 'VEG' : 'NON-VEG'}</span>
+                        <h4 style="margin-bottom:6px;">${dish.name}</h4>
+                        <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px; flex-grow:1;">${dish.description}</p>
+                        <div class="flex justify-between align-center" style="margin-top:auto;">
+                            <div class="flex-col">
+                                <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Price</span>
+                                <strong style="color:var(--primary); font-size:18px;">₹${dish.price}</strong>
+                            </div>
+                            <div class="flex align-center" style="gap:10px;">
+                                <span style="font-size:12px; color:var(--warning); font-weight:600;">
+                                    <i class="fa-solid fa-star"></i> ${dish.rating}
+                                </span>
+                                <button class="btn btn-primary btn-sm" onclick="addToCart('${dish.id}')" ${!dish.available ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-cart-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function setCategory(category) {
+            selectedCategory = category;
+            
+            const tabs = document.querySelectorAll('.category-tab');
+            tabs.forEach(tab => {
+                if (tab.innerText === category || (category === 'All' && tab.innerText === 'All Categories')) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            loadMenu();
+        }
+
+        function handleFiltersChange() {
+            loadMenu();
+        }
+
+        function addToCart(id) {
+            const menu = dbGet('menuItems');
+            const dish = menu.find(item => item.id === id);
+            if (!dish) return;
+
+            let cart = JSON.parse(localStorage.getItem('cart_' + currentUser.id)) || [];
+            const exist = cart.find(item => item.id === id);
+
+            if (exist) {
+                exist.qty++;
+            } else {
+                cart.push({
+                    id: dish.id,
+                    name: dish.name,
+                    price: dish.price,
+                    qty: 1
+                });
+            }
+
+            localStorage.setItem('cart_' + currentUser.id, JSON.stringify(cart));
+            updateCartBadge();
+            showToast(`Added ${dish.name} to cart!`, "success");
+        }
+
+        function updateCartBadge() {
+            const cart = JSON.parse(localStorage.getItem('cart_' + currentUser.id)) || [];
+            const badge = document.getElementById('sidebar-cart-badge');
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            if (totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

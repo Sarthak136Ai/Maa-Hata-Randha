@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floor Seating View | Maa Hata Randha Staff</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .legend-color.occupied { background-color: #1e90ff; }
+        .legend-color.calling { background-color: #ff4757; animation: pulseRed 1.5s infinite; }
+        .restaurant-table.occupied { background-color: #1e90ff; }
+        .restaurant-table.calling { background-color: #ff4757; animation: pulseRed 1.5s infinite; }
+        
+        @keyframes pulseRed {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        }
+        
+        .floor-detail-panel {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Manage Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="tables.html" class="sidebar-link">
+                        <i class="fa-solid fa-chair"></i>
+                        <span>Floor Layout</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="requests.html" class="sidebar-link">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>Assistance Calls</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Dining Floor Map</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">S</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Floor Manager</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="reserve-grid">
+                    <!-- Floor Plan Grid -->
+                    <div class="floorplan-container">
+                        <h4 style="margin-bottom: 16px;">Live Seating Status</h4>
+                        
+                        <div class="floorplan-legend">
+                            <div class="legend-item"><div class="legend-color available"></div><span>Available / Vacant</span></div>
+                            <div class="legend-item"><div class="legend-color reserved"></div><span>Reserved Today</span></div>
+                            <div class="legend-item"><div class="legend-color occupied"></div><span>Occupied (Dining)</span></div>
+                            <div class="legend-item"><div class="legend-color calling"></div><span>Needs Attention</span></div>
+                        </div>
+
+                        <div class="floorplan-sections" id="staff-floorplan-box">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Details Inspector panel -->
+                    <div class="floor-detail-panel flex-col" style="gap: 20px;">
+                        <h4 style="border-bottom:1px solid var(--border-color); padding-bottom:12px;">Table Inspector</h4>
+                        <div id="inspector-content">
+                            <p style="color:var(--text-muted); font-size:13px;">Click on any table card in the layout to inspect detailed status, orders, or active waiter alerts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script>
+        const currentUser = checkAccess(['staff', 'admin']);
+        let selectedTableId = "";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            loadLiveTables();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                loadLiveTables();
+            });
+        });
+
+        function loadLiveTables() {
+            const tables = dbGet('tables');
+            const reservations = dbGet('reservations');
+            const orders = dbGet('orders');
+            const requests = dbGet('serviceRequests');
+
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            // Group tables by section
+            const sections = {};
+            tables.forEach(table => {
+                if (!sections[table.section]) {
+                    sections[table.section] = [];
+                }
+                sections[table.section].push(table);
+            });
+
+            const container = document.getElementById('staff-floorplan-box');
+            container.innerHTML = '';
+
+            for (const sectionName in sections) {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'floorplan-section';
+                sectionDiv.innerHTML = `<h5 class="floorplan-section-title">${sectionName}</h5>`;
+
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'tables-grid';
+
+                sections[sectionName].forEach(table => {
+                    const tableDiv = document.createElement('div');
+                    
+                    const isCalling = requests.find(r => r.tableId === table.id && r.status !== 'Completed');
+
+                    const isOccupied = orders.find(o => 
+                        o.tableId === table.id && 
+                        o.orderType === 'Dine-in' && 
+                        !['Served', 'Cancelled'].includes(o.status)
+                    );
+
+                    const isReservedToday = reservations.find(r => 
+                        r.tableId === table.id && 
+                        r.date === todayStr && 
+                        r.status === 'Confirmed'
+                    );
+
+                    let statusClass = 'available';
+                    let iconHtml = '<i class="fa-solid fa-chair"></i>';
+
+                    if (isCalling) {
+                        statusClass = 'calling';
+                        iconHtml = '<i class="fa-solid fa-bell fa-shake"></i>';
+                    } else if (isOccupied) {
+                        statusClass = 'occupied';
+                        iconHtml = '<i class="fa-solid fa-utensils"></i>';
+                    } else if (isReservedToday) {
+                        statusClass = 'reserved';
+                        iconHtml = '<i class="fa-solid fa-calendar-check"></i>';
+                    } else if (table.status !== 'Available') {
+                        statusClass = 'unavailable';
+                        iconHtml = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                    }
+
+                    if (selectedTableId === table.id) {
+                        tableDiv.style.border = "3px solid var(--secondary)";
+                    }
+
+                    tableDiv.className = `restaurant-table ${statusClass}`;
+                    tableDiv.setAttribute('onclick', `inspectTable('${table.id}')`);
+                    tableDiv.innerHTML = `
+                        <span class="table-no">${table.number}</span>
+                        <span class="table-seats">${table.capacity} Seats</span>
+                        <div style="font-size:14px; margin-top:6px;">
+                            ${iconHtml}
+                        </div>
+                    `;
+
+                    gridDiv.appendChild(tableDiv);
+                });
+
+                sectionDiv.appendChild(gridDiv);
+                container.appendChild(sectionDiv);
+            }
+
+            if (selectedTableId) {
+                inspectTable(selectedTableId);
+            }
+        }
+
+        function inspectTable(id) {
+            selectedTableId = id;
+            
+            const tables = dbGet('tables');
+            const reservations = dbGet('reservations');
+            const orders = dbGet('orders');
+            const requests = dbGet('serviceRequests');
+
+            const tbl = tables.find(t => t.id === id);
+            const inspector = document.getElementById('inspector-content');
+
+            if (!tbl) {
+                inspector.innerHTML = `<p style="color:var(--text-muted); font-size:13px;">Selected table not found.</p>`;
+                return;
+            }
+
+            const activeOrders = orders.filter(o => 
+                o.tableId === id && 
+                o.orderType === 'Dine-in' && 
+                !['Served', 'Cancelled'].includes(o.status)
+            );
+
+            const activeAlerts = requests.filter(r => r.tableId === id && r.status !== 'Completed');
+            const todayStr = new Date().toISOString().split('T')[0];
+            const bookingsToday = reservations.filter(r => r.tableId === id && r.date === todayStr && r.status === 'Confirmed');
+
+            let alertsHtml = '<p style="color:var(--text-muted); font-size:12px;">No active waiter alerts.</p>';
+            if (activeAlerts.length > 0) {
+                alertsHtml = activeAlerts.map(a => `
+                    <div style="background-color:#fff5f5; border:1px solid #ffccd5; border-radius:4px; padding:8px; margin-bottom:6px; font-size:12px; font-weight:600; color:#ff4757;" class="flex justify-between align-center">
+                        <span><i class="fa-solid fa-bell"></i> ${a.type} (${a.status})</span>
+                        <button class="btn btn-sm btn-success" style="padding:2px 6px; font-size:10px;" onclick="resolveAlertDirect('${a.requestId}')">Clear</button>
+                    </div>
+                `).join('');
+            }
+
+            let ordersHtml = '<p style="color:var(--text-muted); font-size:12px;">No active food preparation.</p>';
+            if (activeOrders.length > 0) {
+                ordersHtml = activeOrders.map(o => `
+                    <div style="background-color:#fafbfe; border:1px solid var(--border-color); border-radius:4px; padding:10px; margin-bottom:8px; font-size:12px;">
+                        <div class="flex justify-between" style="margin-bottom:4px;">
+                            <strong>Order: ${o.orderId}</strong>
+                            <span class="badge badge-info">${o.status}</span>
+                        </div>
+                        <p style="color:var(--text-muted); font-size:11px;">
+                            ${o.items.map(it => `${it.name} (x${it.qty})`).join(', ')}
+                        </p>
+                    </div>
+                `).join('');
+            }
+
+            let bookingHtml = '<p style="color:var(--text-muted); font-size:12px;">No reservations scheduled today.</p>';
+            if (bookingsToday.length > 0) {
+                bookingHtml = bookingsToday.map(b => `
+                    <div style="font-size:12px; margin-bottom:4px;">
+                        <i class="fa-solid fa-calendar-check" style="color:var(--success);"></i> 
+                        <strong>${b.timeSlot}</strong> &bull; ${b.customerName} (${b.guests} guests)
+                    </div>
+                `).join('');
+            }
+
+            inspector.innerHTML = `
+                <div class="flex-col" style="gap: 16px;">
+                    <div>
+                        <h3 style="color:var(--primary); font-size:22px;">Table ${tbl.number}</h3>
+                        <p style="font-size:12px; color:var(--text-muted);">${tbl.capacity} Seats &bull; ${tbl.section} &bull; ${tbl.shape}</p>
+                    </div>
+
+                    <div>
+                        <h5 style="margin-bottom:6px; color:var(--secondary);">Urgent Requests</h5>
+                        ${alertsHtml}
+                    </div>
+
+                    <div>
+                        <h5 style="margin-bottom:6px; color:var(--secondary);">Active Orders</h5>
+                        ${ordersHtml}
+                    </div>
+
+                    <div>
+                        <h5 style="margin-bottom:6px; color:var(--secondary);">Reservations Today</h5>
+                        ${bookingHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function resolveAlertDirect(id) {
+            const requests = dbGet('serviceRequests');
+            const reqIdx = requests.findIndex(r => r.requestId === id);
+            
+            if (reqIdx !== -1) {
+                requests[reqIdx].status = 'Completed';
+                dbSet('serviceRequests', requests);
+                showToast("Request resolved.", "success");
+                loadLiveTables();
+            }
+        }
+    </script>
+</body>
+</html>

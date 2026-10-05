@@ -1,0 +1,779 @@
+{
+  "users": [
+    {
+      "id": "U001",
+      "name": "Restaurant Admin",
+      "email": "admin@restaurant.com",
+      "password": "admin123",
+      "role": "admin"
+    },
+    {
+      "id": "U002",
+      "name": "Floor Host Staff",
+      "email": "staff@restaurant.com",
+      "password": "staff123",
+      "role": "staff"
+    },
+    {
+      "id": "U003",
+      "name": "Valued Customer",
+      "email": "customer@restaurant.com",
+      "password": "customer123",
+      "role": "customer"
+    },
+    {
+      "id": "U004",
+      "name": "Alice Chef",
+      "email": "chef@restaurant.com",
+      "password": "staff123",
+      "role": "staff",
+      "staffRole": "Chef"
+    },
+    {
+      "id": "U005",
+      "name": "Bob Waiter",
+      "email": "waiter@restaurant.com",
+      "password": "staff123",
+      "role": "staff",
+      "staffRole": "Waiter"
+    },
+    {
+      "id": "U3701",
+      "name": "Sarthak Satapathy",
+      "email": "sarthaksatapathy1@gmail.com",
+      "password": "123456",
+      "role": "customer"
+    }
+  ],
+  "tables": [
+    {
+      "id": "T1",
+      "number": "T1",
+      "capacity": 2,
+      "section": "Window Area",
+      "shape": "square",
+      "status": "Available",
+      "x": 100,
+      "y": 100
+    },
+    {
+      "id": "T2",
+      "number": "T2",
+      "capacity": 2,
+      "section": "Window Area",
+      "shape": "round",
+      "status": "Available",
+      "x": 250,
+      "y": 100
+    },
+    {
+      "id": "T3",
+      "number": "T3",
+      "capacity": 4,
+      "section": "Main Dining Area",
+      "shape": "square",
+      "status": "Available",
+      "x": 80,
+      "y": 220
+    },
+    {
+      "id": "T4",
+      "number": "T4",
+      "capacity": 4,
+      "section": "Main Dining Area",
+      "shape": "square",
+      "status": "Available",
+      "x": 240,
+      "y": 220
+    },
+    {
+      "id": "T5",
+      "number": "T5",
+      "capacity": 6,
+      "section": "Main Dining Area",
+      "shape": "rectangle",
+      "status": "Available",
+      "x": 400,
+      "y": 220
+    },
+    {
+      "id": "T6",
+      "number": "T6",
+      "capacity": 8,
+      "section": "Main Dining Area",
+      "shape": "rectangle",
+      "status": "Available",
+      "x": 550,
+      "y": 220
+    },
+    {
+      "id": "T7",
+      "number": "T7",
+      "capacity": 2,
+      "section": "Outdoor Seating",
+      "shape": "round",
+      "status": "Available",
+      "x": 100,
+      "y": 380
+    },
+    {
+      "id": "T8",
+      "number": "T8",
+      "capacity": 4,
+      "section": "Outdoor Seating",
+      "shape": "square",
+      "status": "Available",
+      "x": 250,
+      "y": 380
+    },
+    {
+      "id": "T9",
+      "number": "T9",
+      "capacity": 4,
+      "section": "VIP Section",
+      "shape": "square",
+      "status": "Available",
+      "x": 450,
+      "y": 100
+    },
+    {
+      "id": "T10",
+      "number": "T10",
+      "capacity": 6,
+      "section": "VIP Section",
+      "shape": "rectangle",
+      "status": "Available",
+      "x": 600,
+      "y": 100
+    },
+    {
+      "id": "T8699",
+      "number": "T11",
+      "capacity": 6,
+      "section": "Main Dining Area",
+      "shape": "rectangle",
+      "status": "Available",
+      "x": 100,
+      "y": 100
+    }
+  ],
+  "menuItems": [
+    {
+      "id": "M001",
+      "name": "Paneer Tikka",
+      "category": "Starters",
+      "description": "Cottage cheese cubes marinated in spiced hung curd, bell peppers, and roasted in clay tandoor.",
+      "price": 240,
+      "rating": 4.8,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M002",
+      "name": "Crispy Spring Rolls",
+      "category": "Starters",
+      "description": "Golden fried rolls stuffed with crunchy julienne vegetables and glass noodles, served with sweet chilli dip.",
+      "price": 180,
+      "rating": 4.5,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M003",
+      "name": "Hara Bhara Kebab",
+      "category": "Starters",
+      "description": "Pan-seared spinach, green peas, and potato patties scented with royal spices and roasted cashew nuts.",
+      "price": 210,
+      "rating": 4.6,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M004",
+      "name": "Crispy Chilli Corn",
+      "category": "Starters",
+      "description": "Sweet corn kernels tossed with crushed black pepper, spring onion, fresh chillies, and lemon zest.",
+      "price": 190,
+      "rating": 4.4,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M005",
+      "name": "Chicken Seekh Kebab",
+      "category": "Starters",
+      "description": "Minced chicken skewers blended with fresh herbs, ginger, and aromatic spices grilled over charcoal embers.",
+      "price": 290,
+      "rating": 4.7,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M006",
+      "name": "Chicken Malai Tikka",
+      "category": "Starters",
+      "description": "Tender chicken morsels marinated in rich cream, cashew paste, cardamom, and gentle cheese glaze.",
+      "price": 320,
+      "rating": 4.9,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1527477321005-4d45d304bc33?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M007",
+      "name": "Amritsari Fish Fry",
+      "category": "Starters",
+      "description": "Crispy carom-spiced batter fried river sole fish fillets served with mint chutney and onion rings.",
+      "price": 360,
+      "rating": 4.8,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M008",
+      "name": "Golden Fried Prawns",
+      "category": "Starters",
+      "description": "Butterflied tiger prawns coated in panko breadcrumbs and fried golden crisp with garlic tartar dip.",
+      "price": 420,
+      "rating": 4.9,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1559742811-82286364ceaf?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M009",
+      "name": "Paneer Butter Masala",
+      "category": "Main Course",
+      "description": "Fresh cottage cheese simmered in a velvet-smooth buttery tomato gravy enriched with fenugreek leaves.",
+      "price": 320,
+      "rating": 4.8,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M010",
+      "name": "Dal Makhani",
+      "category": "Main Course",
+      "description": "Black lentils and kidney beans slow-cooked overnight with churned butter and fresh cream on charcoal tandoor.",
+      "price": 260,
+      "rating": 4.9,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M011",
+      "name": "Kadai Paneer",
+      "category": "Main Course",
+      "description": "Cottage cheese and crisp bell peppers stir-fried in a spicy freshly pounded coriander and red chilli gravy.",
+      "price": 310,
+      "rating": 4.6,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M012",
+      "name": "Shahi Malai Kofta",
+      "category": "Main Course",
+      "description": "Melt-in-mouth cottage cheese and dry-fruit dumplings in a fragrant saffron cashew nut sauce.",
+      "price": 340,
+      "rating": 4.7,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M013",
+      "name": "Butter Chicken",
+      "category": "Main Course",
+      "description": "Tandoori grilled chicken chunks braised in a luxurious satin tomato, butter, honey, and cream sauce.",
+      "price": 380,
+      "rating": 4.9,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M014",
+      "name": "Chicken Tikka Masala",
+      "category": "Main Course",
+      "description": "Charcoal roasted chicken tikka cooked in an onion-tomato spicy masala with bell peppers.",
+      "price": 370,
+      "rating": 4.7,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M015",
+      "name": "Mutton Rogan Josh",
+      "category": "Main Course",
+      "description": "Tender Kashmiri lamb shanks slow-simmered in aromatic fennel, ginger, and ratanjot spiced red gravy.",
+      "price": 450,
+      "rating": 4.9,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1545247181-516773cae754?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M016",
+      "name": "Garlic Butter Naan Basket",
+      "category": "Main Course",
+      "description": "Freshly baked tandoori leavened flatbread brushed with garlic butter and fresh coriander (3 pieces).",
+      "price": 120,
+      "rating": 4.7,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M017",
+      "name": "Hyderabadi Chicken Dum Biryani",
+      "category": "Biryani",
+      "description": "Aromatic long-grain basmati rice layered with spiced marinated chicken and slow-steamed in a sealed clay pot.",
+      "price": 360,
+      "rating": 4.9,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M018",
+      "name": "Royal Mutton Dum Biryani",
+      "category": "Biryani",
+      "description": "Prime cuts of juicy mutton slow-cooked with saffron-infused basmati rice, fried onions, and kewra essence.",
+      "price": 440,
+      "rating": 4.9,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M019",
+      "name": "Veg Dum Biryani",
+      "category": "Biryani",
+      "description": "Garden vegetables, paneer cubes, and fragrant basmati rice layered with mint, saffron, and roasted nuts.",
+      "price": 280,
+      "rating": 4.5,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M020",
+      "name": "Margherita Pizza (10 inch)",
+      "category": "Fast Foods",
+      "description": "Hand-stretched artisan crust topped with Italian San Marzano tomato sauce, fresh basil, and mozzarella cheese.",
+      "price": 310,
+      "rating": 4.6,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M021",
+      "name": "Chicken Feast Supreme Pizza",
+      "category": "Fast Foods",
+      "description": "Loaded with BBQ grilled chicken, spicy peri peri chicken, red onions, jalapenos, and mozzarella.",
+      "price": 410,
+      "rating": 4.8,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M022",
+      "name": "Farmhouse Veggie Pizza",
+      "category": "Fast Foods",
+      "description": "Loaded with mushrooms, bell peppers, sweet corn, black olives, red paprika, and mozzarella cheese.",
+      "price": 350,
+      "rating": 4.5,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M023",
+      "name": "Classic Aloo Tikki Burger",
+      "category": "Fast Foods",
+      "description": "Crispy spiced herb potato patty, tomato slice, crunchy lettuce, and tangy mint mayo in toasted sesame bun.",
+      "price": 150,
+      "rating": 4.3,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M024",
+      "name": "Crispy Chicken Zinger Burger",
+      "category": "Fast Foods",
+      "description": "Super crunchy spiced fried chicken breast fillet, melted cheddar cheese slice, coleslaw, and sriracha aioli.",
+      "price": 240,
+      "rating": 4.8,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M025",
+      "name": "Cheesy Peri Peri French Fries",
+      "category": "Fast Foods",
+      "description": "Crispy golden potato fries tossed in fiery African peri peri seasoning and drizzled with warm cheese sauce.",
+      "price": 160,
+      "rating": 4.7,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1576107232684-1279f3908594?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M026",
+      "name": "Loaded Mexican Nachos",
+      "category": "Fast Foods",
+      "description": "Crispy corn tortilla chips baked with cheddar cheese, refried beans, pico de gallo salsa, and sour cream.",
+      "price": 220,
+      "rating": 4.6,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M027",
+      "name": "Paneer Tikka Kathi Roll",
+      "category": "Fast Foods",
+      "description": "Smoky tandoori paneer cubes, crunchy onions, and green mint chutney wrapped in a flaky paratha.",
+      "price": 190,
+      "rating": 4.6,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M028",
+      "name": "Chicken Shawarma Roll",
+      "category": "Fast Foods",
+      "description": "Shredded rotisserie spiced chicken, pickled cucumbers, garlic toum sauce, and fries rolled in warm pita.",
+      "price": 220,
+      "rating": 4.8,
+      "isVeg": false,
+      "image": "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M029",
+      "name": "Molten Chocolate Lava Cake",
+      "category": "Desserts",
+      "description": "Warm dark chocolate sponge cake with a rich oozing molten Belgian chocolate center, served fresh.",
+      "price": 190,
+      "rating": 4.9,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M030",
+      "name": "Gulab Jamun with Ice Cream",
+      "category": "Desserts",
+      "description": "Warm golden milk dumplings soaked in cardamom-saffron sugar syrup served with rich vanilla bean ice cream.",
+      "price": 150,
+      "rating": 4.8,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1623934524442-6e4b2d9b1c73?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M031",
+      "name": "Royal Rasmalai (2 Pcs)",
+      "category": "Desserts",
+      "description": "Soft and spongy cottage cheese patties soaked in chilled, thick cardamom and pistachio-infused saffron milk.",
+      "price": 170,
+      "rating": 4.9,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M032",
+      "name": "Sizzling Brownie with Vanilla",
+      "category": "Desserts",
+      "description": "Warm walnut brownie served on a hot sizzling skillet topped with vanilla ice cream and hot fudge sauce.",
+      "price": 220,
+      "rating": 4.9,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M033",
+      "name": "Fresh Lime Soda (Sweet & Salt)",
+      "category": "Beverages",
+      "description": "Sparkling bubbly soda mixed with freshly squeezed lime juice, mint leaves, rock salt, and ice.",
+      "price": 95,
+      "rating": 4.4,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M034",
+      "name": "Iced Caramel Macchiato",
+      "category": "Beverages",
+      "description": "Freshly brewed espresso poured over chilled whole milk, vanilla syrup, and drizzled with caramel sauce.",
+      "price": 170,
+      "rating": 4.7,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M035",
+      "name": "Virgin Blue Lagoon Mocktail",
+      "category": "Beverages",
+      "description": "Refreshing blend of blue curacao syrup, crushed ice, sprite, fresh mint leaves, and lemon wedge.",
+      "price": 160,
+      "rating": 4.6,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M036",
+      "name": "Alphonso Mango Lassi",
+      "category": "Beverages",
+      "description": "Traditional thick and creamy yogurt smoothie churned with sweet Alphonso mango pulp and saffron.",
+      "price": 140,
+      "rating": 4.9,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    },
+    {
+      "id": "M037",
+      "name": "Oreo Chocolate Crunch Milkshake",
+      "category": "Beverages",
+      "description": "Thick creamy shake blended with crunchy Oreo cookies, chocolate sauce, and topped with whipped cream.",
+      "price": 180,
+      "rating": 4.8,
+      "isVeg": true,
+      "image": "https://images.unsplash.com/photo-1577805947697-89e18249d767?w=600&auto=format&fit=crop&q=80",
+      "available": true
+    }
+  ],
+  "reservations": [
+    {
+      "reservationId": "RES9801",
+      "customerId": "U003",
+      "customerName": "Valued Customer",
+      "date": "2026-09-15",
+      "timeSlot": "19:00-21:00",
+      "guests": 4,
+      "tableId": "T3",
+      "status": "Confirmed"
+    },
+    {
+      "reservationId": "RES2490",
+      "customerId": "U003",
+      "customerName": "Valued Customer",
+      "date": "2026-09-18",
+      "timeSlot": "18:00-20:00",
+      "guests": 2,
+      "tableId": "T1",
+      "status": "Confirmed"
+    }
+  ],
+  "orders": [
+    {
+      "orderId": "ORD1001",
+      "customerId": "U003",
+      "customerName": "Valued Customer",
+      "items": [
+        {
+          "id": "M001",
+          "name": "Paneer Tikka",
+          "price": 240,
+          "qty": 1
+        },
+        {
+          "id": "M004",
+          "name": "Butter Chicken",
+          "price": 380,
+          "qty": 1
+        },
+        {
+          "id": "M007",
+          "name": "Chicken Dum Biryani",
+          "price": 350,
+          "qty": 2
+        }
+      ],
+      "orderType": "Dine-in",
+      "tableId": "T3",
+      "subtotal": 1320,
+      "tax": 66,
+      "discount": 0,
+      "total": 1386,
+      "status": "Served",
+      "createdAt": "2026-09-15T08:00:00.000Z"
+    },
+    {
+      "orderId": "ORD1002",
+      "customerId": "U003",
+      "customerName": "Valued Customer",
+      "items": [
+        {
+          "id": "M010",
+          "name": "Margherita Pizza",
+          "price": 300,
+          "qty": 2
+        },
+        {
+          "id": "M017",
+          "name": "Iced Caramel Macchiato",
+          "price": 160,
+          "qty": 2
+        }
+      ],
+      "orderType": "Takeaway",
+      "tableId": "",
+      "subtotal": 920,
+      "tax": 46,
+      "discount": 50,
+      "total": 916,
+      "status": "Served",
+      "createdAt": "2026-09-15T09:15:00.000Z"
+    },
+    {
+      "orderId": "ORD3791",
+      "customerId": "U003",
+      "customerName": "Valued Customer",
+      "items": [
+        {
+          "id": "M004",
+          "name": "Butter Chicken",
+          "price": 380,
+          "qty": 1
+        }
+      ],
+      "orderType": "Takeaway",
+      "tableId": "",
+      "subtotal": 380,
+      "tax": 19,
+      "discount": 0,
+      "total": 399,
+      "status": "Served",
+      "createdAt": "2026-09-18T05:04:26.585Z",
+      "instructions": ""
+    },
+    {
+      "orderId": "ORD5490",
+      "customerId": "U003",
+      "customerName": "Valued Customer",
+      "items": [
+        {
+          "id": "M004",
+          "name": "Butter Chicken",
+          "price": 380,
+          "qty": 1
+        }
+      ],
+      "orderType": "Dine-in",
+      "tableId": "T5",
+      "subtotal": 380,
+      "tax": 19,
+      "discount": 0,
+      "total": 399,
+      "status": "Served",
+      "createdAt": "2026-09-18T05:11:17.405Z",
+      "instructions": ""
+    },
+    {
+      "orderId": "ORD5572",
+      "customerId": "U003",
+      "customerName": "Valued Customer",
+      "items": [
+        {
+          "id": "M008",
+          "name": "Mutton Biryani",
+          "price": 420,
+          "qty": 1
+        }
+      ],
+      "orderType": "Dine-in",
+      "tableId": "T1",
+      "subtotal": 420,
+      "tax": 21,
+      "discount": 0,
+      "total": 441,
+      "status": "Served",
+      "createdAt": "2026-09-18T05:16:17.892Z",
+      "instructions": ""
+    }
+  ],
+  "serviceRequests": [
+    {
+      "requestId": "REQ7001",
+      "tableId": "T3",
+      "type": "Call Waiter",
+      "status": "Completed",
+      "createdAt": "2026-09-15T09:20:00.000Z"
+    },
+    {
+      "requestId": "REQ2725",
+      "tableId": "T3",
+      "type": "Call Waiter",
+      "status": "Completed",
+      "createdAt": "2026-09-18T05:05:41.669Z"
+    },
+    {
+      "requestId": "REQ9122",
+      "tableId": "T3",
+      "type": "Request Bill",
+      "status": "Completed",
+      "createdAt": "2026-09-18T05:05:54.017Z"
+    },
+    {
+      "requestId": "REQ3850",
+      "tableId": "T3",
+      "type": "Request Water",
+      "status": "Completed",
+      "createdAt": "2026-09-18T05:06:13.449Z"
+    },
+    {
+      "requestId": "REQ4956",
+      "tableId": "T3",
+      "type": "Need Assistance",
+      "status": "Completed",
+      "createdAt": "2026-09-18T05:06:18.937Z"
+    },
+    {
+      "requestId": "REQ1085",
+      "tableId": "T5",
+      "type": "Call Waiter",
+      "status": "Completed",
+      "createdAt": "2026-09-18T05:12:57.270Z"
+    },
+    {
+      "requestId": "REQ2323",
+      "tableId": "T1",
+      "type": "Call Waiter",
+      "status": "Accepted",
+      "createdAt": "2026-09-18T05:18:09.726Z"
+    },
+    {
+      "requestId": "REQ9707",
+      "tableId": "T1",
+      "type": "Request Water",
+      "status": "Pending",
+      "createdAt": "2026-09-18T05:18:11.533Z"
+    }
+  ],
+  "version": 42,
+  "updatedAt": 1790761254.2523735
+}

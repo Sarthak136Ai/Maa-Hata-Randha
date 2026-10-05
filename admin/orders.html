@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders | Maa Hata Randha Admin</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="menu-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-bowl-food"></i>
+                        <span>Menu Items</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="table-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-map"></i>
+                        <span>Tables & Layout</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Orders Master</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="staff-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Staff Directory</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="customers.html" class="sidebar-link">
+                        <i class="fa-solid fa-address-book"></i>
+                        <span>Customer Registry</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="analytics.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Analytics Insights</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>All Orders Master Log</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">A</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Filters panel -->
+                <div class="card flex justify-between align-center" style="padding:16px; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+                    <div class="flex align-center" style="gap:10px; flex-wrap:wrap;">
+                        <input type="text" id="order-search" class="form-control" placeholder="Search Order ID / Customer..." oninput="loadAdminOrders()" style="width: 250px;">
+                        <select id="order-status-filter" class="form-control" onchange="loadAdminOrders()" style="width: 180px;">
+                            <option value="All">All Statuses</option>
+                            <option value="Placed">Placed</option>
+                            <option value="Accepted">Accepted</option>
+                            <option value="Preparing">Preparing</option>
+                            <option value="Ready">Ready</option>
+                            <option value="Served">Served</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div style="font-size:14px; font-weight:700; color:var(--secondary);">
+                        Total Revenue: <span id="filtered-revenue" style="color:var(--success);">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Master Orders Table -->
+                <div class="card" style="padding: 20px;">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Type</th>
+                                    <th>Table</th>
+                                    <th>Bill Amount</th>
+                                    <th>Order Status</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-orders-rows">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/staff.js"></script>
+    <script>
+        const currentUser = checkAccess(['admin']);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            loadAdminOrders();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                loadAdminOrders();
+            });
+        });
+
+        function loadAdminOrders() {
+            const orders = dbGet('orders');
+            const tbody = document.getElementById('admin-orders-rows');
+            tbody.innerHTML = '';
+
+            const searchVal = document.getElementById('order-search').value.toLowerCase().trim();
+            const statusVal = document.getElementById('order-status-filter').value;
+
+            let filtered = orders;
+            if (statusVal !== 'All') {
+                filtered = filtered.filter(o => o.status === statusVal);
+            }
+            if (searchVal) {
+                filtered = filtered.filter(o => 
+                    o.orderId.toLowerCase().includes(searchVal) || 
+                    o.customerName.toLowerCase().includes(searchVal)
+                );
+            }
+
+            const matchedRevenue = filtered
+                .filter(o => o.status === 'Served')
+                .reduce((sum, o) => sum + o.total, 0);
+            
+            document.getElementById('filtered-revenue').innerText = `₹${matchedRevenue.toLocaleString()}`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No matching transactions found.</td></tr>`;
+                return;
+            }
+
+            [...filtered].reverse().forEach(o => {
+                let badgeClass = 'badge-warning';
+                if (o.status === 'Served') badgeClass = 'badge-success';
+                else if (o.status === 'Cancelled') badgeClass = 'badge-danger';
+                else if (o.status === 'Preparing') badgeClass = 'badge-info';
+
+                let statusDropOptions = ["Placed", "Accepted", "Preparing", "Ready", "Served", "Cancelled"]
+                    .map(st => `<option value="${st}" ${o.status === st ? 'selected' : ''}>${st}</option>`)
+                    .join('');
+
+                const selectModifier = `
+                    <select class="form-control form-control-sm" style="width: 120px; padding: 4px 8px; font-size:12px;" onchange="adminUpdateOrder('${o.orderId}', this.value)">
+                        ${statusDropOptions}
+                    </select>
+                `;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${o.orderId}</strong></td>
+                        <td>${o.customerName}</td>
+                        <td>${o.orderType}</td>
+                        <td>${o.tableId ? 'Table ' + o.tableId : '--'}</td>
+                        <td><strong>₹${o.total}</strong></td>
+                        <td><span class="badge ${badgeClass}">${o.status}</span></td>
+                        <td>${new Date(o.createdAt).toLocaleDateString()} ${new Date(o.createdAt).toLocaleTimeString()}</td>
+                        <td>${selectModifier}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function adminUpdateOrder(id, nextState) {
+            const res = changeOrderStatus(id, nextState);
+            if (res.success) {
+                showToast(`Order ${id} status set to ${nextState}.`, "success");
+                loadAdminOrders();
+            } else {
+                showToast(res.message, "error");
+            }
+        }
+    </script>
+</body>
+</html>

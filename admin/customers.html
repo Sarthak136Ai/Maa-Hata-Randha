@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Registry | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="menu-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-bowl-food"></i>
+                        <span>Menu Items</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="table-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-map"></i>
+                        <span>Tables & Layout</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Orders Master</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="staff-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Staff Directory</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="customers.html" class="sidebar-link">
+                        <i class="fa-solid fa-address-book"></i>
+                        <span>Customer Registry</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="analytics.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Analytics Insights</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Guest Registry Database</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">A</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="card flex justify-between align-center" style="padding:16px; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+                    <input type="text" id="cust-search" class="form-control" placeholder="Search by name / email..." oninput="loadCustomers()" style="width: 300px;">
+                    <div style="font-size:12px; color:var(--text-muted);"><i class="fa-solid fa-database"></i> Customer accounts logged</div>
+                </div>
+
+                <!-- Customer Registry Table -->
+                <div class="card" style="padding:20px;">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email Address</th>
+                                    <th>Total Orders Placed</th>
+                                    <th>Total Bookings</th>
+                                    <th>Dine Points</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-table-rows">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script>
+        const currentUser = checkAccess(['admin']);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            loadCustomers();
+        });
+
+        function loadCustomers() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const reservations = JSON.parse(localStorage.getItem('reservations')) || [];
+
+            const tbody = document.getElementById('customers-table-rows');
+            tbody.innerHTML = '';
+
+            const searchVal = document.getElementById('cust-search').value.toLowerCase().trim();
+            const customers = users.filter(u => u.role === 'customer');
+
+            let filtered = customers;
+            if (searchVal) {
+                filtered = filtered.filter(u => 
+                    u.name.toLowerCase().includes(searchVal) || 
+                    u.email.toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No customer profiles found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(c => {
+                const totalOrdersCount = orders.filter(o => o.customerId === c.id).length;
+                const totalBookingsCount = reservations.filter(r => r.customerId === c.id).length;
+                
+                // Simulating Dine Points (e.g. orders count * 50 + bookings * 20)
+                const loyaltyPoints = (totalOrdersCount * 50) + (totalBookingsCount * 25);
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${c.id}</strong></td>
+                        <td>${c.name}</td>
+                        <td>${c.email}</td>
+                        <td>${totalOrdersCount} Orders</td>
+                        <td>${totalBookingsCount} Reservations</td>
+                        <td><strong style="color:var(--warning);"><i class="fa-solid fa-award"></i> ${loyaltyPoints}</strong></td>
+                    </tr>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

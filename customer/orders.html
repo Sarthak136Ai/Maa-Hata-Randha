@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Orders | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .orders-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 992px) {
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .service-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .service-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        .active-req-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background-color: #fafbfe;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-gauge"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="menu.html" class="sidebar-link">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                        <span>Digital Menu</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="reservation.html" class="sidebar-link">
+                        <i class="fa-solid fa-chair"></i>
+                        <span>Book Table</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="cart.html" class="sidebar-link">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span>Active Cart</span>
+                        <span id="sidebar-cart-badge" class="badge badge-danger" style="margin-left: auto; display: none;">0</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Track Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="profile.html" class="sidebar-link">
+                        <i class="fa-solid fa-user-gear"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Track Orders & Requests</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Premium Guest</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="orders-grid">
+                    <!-- Orders tracking timeline section -->
+                    <div class="flex-col" style="gap: 24px;">
+                        <h4 style="margin-bottom: 4px;">Active Orders Pipeline</h4>
+                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+                            <i class="fa-solid fa-rotate"></i> Order updates sync automatically across all devices.
+                        </p>
+
+                        <div id="active-orders-container" class="flex-col" style="gap: 20px;">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <div class="card" style="margin-top: 20px;">
+                            <h4 style="border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
+                                Order History
+                            </h4>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Type</th>
+                                            <th>Table</th>
+                                            <th>Total Bill</th>
+                                            <th>Status</th>
+                                            <th>Date & Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="previous-orders-rows">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dine-in Service Desk widget -->
+                    <div class="flex-col" style="gap: 24px;">
+                        <div class="card">
+                            <h4 style="border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
+                                Dine-in Assistant
+                            </h4>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="request-table-select">Your Current Table</label>
+                                <select id="request-table-select" class="form-control" onchange="onTableSelectChange()">
+                                    <option value="">-- Select Table --</option>
+                                    <!-- Options filled dynamically -->
+                                </select>
+                            </div>
+
+                            <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap:12px; margin-bottom:20px;" id="request-buttons-box">
+                                <button class="service-btn" onclick="sendService('Call Waiter')">
+                                    <i class="fa-solid fa-bell" style="font-size:20px;"></i>
+                                    <span>Call Waiter</span>
+                                </button>
+                                <button class="service-btn" onclick="sendService('Request Water')">
+                                    <i class="fa-solid fa-glass-water" style="font-size:20px;"></i>
+                                    <span>Need Water</span>
+                                </button>
+                                <button class="service-btn" onclick="sendService('Request Bill')">
+                                    <i class="fa-solid fa-receipt" style="font-size:20px;"></i>
+                                    <span>Request Bill</span>
+                                </button>
+                                <button class="service-btn" onclick="sendService('Need Assistance')">
+                                    <i class="fa-solid fa-hand-holding-hand" style="font-size:20px;"></i>
+                                    <span>Assistance</span>
+                                </button>
+                            </div>
+
+                            <div style="border-top:1px solid var(--border-color); padding-top:16px;">
+                                <h5 style="margin-bottom:12px; color:var(--secondary);">Active Waiter Calls</h5>
+                                <div id="active-requests-log">
+                                    <p style="color:var(--text-muted); font-size:12px;">No active assistance calls for this table.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/orders.js"></script>
+    <script>
+        const currentUser = checkAccess(['customer']);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            loadOrders();
+            populateTablesList();
+            updateCartBadge();
+
+            // Real-time listener for multi-tab and multi-browser updates
+            window.addEventListener('db_updated', () => {
+                loadOrders();
+                loadServiceRequests();
+                populateTablesList();
+            });
+        });
+
+        function populateTablesList() {
+            const select = document.getElementById('request-table-select');
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">-- Select Table --</option>';
+
+            const tables = dbGet('tables');
+            tables.forEach(t => {
+                select.innerHTML += `<option value="${t.id}">Table ${t.number} (${t.section})</option>`;
+            });
+
+            if (currentVal) {
+                select.value = currentVal;
+            } else {
+                // If user has a booking today, default to it
+                const reservations = dbGet('reservations');
+                const todayStr = new Date().toISOString().split('T')[0];
+                const myBooking = reservations.find(r => 
+                    r.customerId === currentUser.id && 
+                    r.date === todayStr && 
+                    r.status === 'Confirmed'
+                );
+
+                if (myBooking) {
+                    select.value = myBooking.tableId;
+                }
+            }
+            onTableSelectChange();
+        }
+
+        function onTableSelectChange() {
+            loadServiceRequests();
+        }
+
+        function loadOrders() {
+            const orders = dbGet('orders');
+            const myOrders = orders.filter(o => o.customerId === currentUser.id);
+
+            const activeContainer = document.getElementById('active-orders-container');
+            const historyBody = document.getElementById('previous-orders-rows');
+
+            activeContainer.innerHTML = '';
+            historyBody.innerHTML = '';
+
+            const activeOrders = myOrders.filter(o => !['Served', 'Cancelled'].includes(o.status));
+            const pastOrders = myOrders.filter(o => ['Served', 'Cancelled'].includes(o.status));
+
+            // Render Active
+            if (activeOrders.length === 0) {
+                activeContainer.innerHTML = `
+                    <div class="card" style="text-align: center; padding:30px;">
+                        <i class="fa-solid fa-clipboard-list" style="font-size:36px; color:var(--text-muted); margin-bottom:12px;"></i>
+                        <p style="color:var(--text-muted);">You have no active orders cooking in the kitchen.</p>
+                    </div>
+                `;
+            } else {
+                [...activeOrders].reverse().forEach(order => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.style.padding = '24px';
+
+                    const statuses = ["Placed", "Accepted", "Preparing", "Ready", "Served"];
+                    const currentIndex = statuses.indexOf(order.status);
+
+                    let timelineHtml = '';
+                    statuses.slice(0, 4).forEach((st, idx) => {
+                        let stepClass = '';
+                        if (idx < currentIndex) stepClass = 'completed';
+                        else if (idx === currentIndex) stepClass = 'active';
+
+                        let desc = "Waiting to process";
+                        if (st === 'Placed') desc = "Order received by staff";
+                        else if (st === 'Accepted') desc = "Kitchen approved the order";
+                        else if (st === 'Preparing') desc = "Chef is cooking your dish";
+                        else if (st === 'Ready') desc = "Dishes ready! Waiter on route";
+
+                        timelineHtml += `
+                            <div class="timeline-item ${stepClass}">
+                                <div class="timeline-icon"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-title">${st}</div>
+                                    <p style="font-size:12px; color:var(--text-muted);">${desc}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    const itemNames = order.items.map(it => `${it.name} (x${it.qty})`).join(', ');
+
+                    card.innerHTML = `
+                        <div class="flex justify-between align-center" style="border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
+                            <div>
+                                <h4 style="color:var(--secondary);">ID: ${order.orderId}</h4>
+                                <p style="font-size:12px; color:var(--text-muted);">${new Date(order.createdAt).toLocaleTimeString()}</p>
+                            </div>
+                            <span class="badge badge-info">${order.status}</span>
+                        </div>
+                        <div style="font-size:13px; margin-bottom:16px;">
+                            <strong>Dishes:</strong> ${itemNames} <br>
+                            <strong>Order Type:</strong> ${order.orderType} ${order.tableId ? `(Table ${order.tableId})` : ''} <br>
+                            <strong>Total Bill:</strong> ₹${order.total}
+                        </div>
+                        <div class="timeline">
+                            ${timelineHtml}
+                        </div>
+                    `;
+                    activeContainer.appendChild(card);
+                });
+            }
+
+            // Render Past
+            if (pastOrders.length === 0) {
+                historyBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align:center; color:var(--text-muted);">No historical orders found.</td>
+                    </tr>
+                `;
+            } else {
+                [...pastOrders].reverse().forEach(order => {
+                    let badgeClass = 'badge-success';
+                    if (order.status === 'Cancelled') badgeClass = 'badge-danger';
+
+                    historyBody.innerHTML += `
+                        <tr>
+                            <td><strong>${order.orderId}</strong></td>
+                            <td>${order.orderType}</td>
+                            <td>${order.tableId ? 'Table ' + order.tableId : '--'}</td>
+                            <td>₹${order.total}</td>
+                            <td><span class="badge ${badgeClass}">${order.status}</span></td>
+                            <td>${new Date(order.createdAt).toLocaleDateString()} ${new Date(order.createdAt).toLocaleTimeString()}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function sendService(type) {
+            const tableId = document.getElementById('request-table-select').value;
+            if (!tableId) {
+                showToast("Please select your table first.", "warning");
+                return;
+            }
+
+            submitServiceRequest(tableId, type);
+            showToast(`${type} alert sent to staff dashboard!`, "success");
+            loadServiceRequests();
+        }
+
+        function loadServiceRequests() {
+            const tableId = document.getElementById('request-table-select').value;
+            const container = document.getElementById('active-requests-log');
+            container.innerHTML = '';
+
+            if (!tableId) {
+                container.innerHTML = `<p style="color:var(--text-muted); font-size:12px;">Choose your table to view active staff alerts.</p>`;
+                return;
+            }
+
+            const active = getActiveRequestsByTable(tableId);
+
+            if (active.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-muted); font-size:12px;">No active assistance calls for this table.</p>`;
+                return;
+            }
+
+            active.forEach(req => {
+                let badgeClass = 'badge-warning';
+                if (req.status === 'Accepted') badgeClass = 'badge-info';
+
+                container.innerHTML += `
+                    <div class="active-req-item">
+                        <div>
+                            <strong>${req.type}</strong>
+                            <p style="font-size:11px; color:var(--text-muted);">${new Date(req.createdAt).toLocaleTimeString()}</p>
+                        </div>
+                        <span class="badge ${badgeClass}">${req.status}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function updateCartBadge() {
+            const cart = JSON.parse(localStorage.getItem('cart_' + currentUser.id)) || [];
+            const badge = document.getElementById('sidebar-cart-badge');
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            if (totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

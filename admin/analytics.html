@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Insights | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        @media (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .chart-box {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            height: 320px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="menu-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-bowl-food"></i>
+                        <span>Menu Items</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="table-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-map"></i>
+                        <span>Tables & Layout</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Orders Master</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="staff-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Staff Directory</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="customers.html" class="sidebar-link">
+                        <i class="fa-solid fa-address-book"></i>
+                        <span>Customer Registry</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="analytics.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Analytics Insights</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Advanced Revenue & Sales Analytics</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">A</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="analytics-grid">
+                    <!-- Daily Revenue -->
+                    <div class="chart-box flex-col">
+                        <h4 style="margin-bottom: 12px; font-size:14px; text-transform:uppercase; color:var(--text-muted);">Daily Sales Revenue</h4>
+                        <div style="flex-grow:1; position:relative;"><canvas id="revenue-chart"></canvas></div>
+                    </div>
+
+                    <!-- Category Share -->
+                    <div class="chart-box flex-col">
+                        <h4 style="margin-bottom: 12px; font-size:14px; text-transform:uppercase; color:var(--text-muted);">Sales By Category</h4>
+                        <div style="flex-grow:1; position:relative;"><canvas id="category-chart"></canvas></div>
+                    </div>
+
+                    <!-- Popular Dishes -->
+                    <div class="chart-box flex-col">
+                        <h4 style="margin-bottom: 12px; font-size:14px; text-transform:uppercase; color:var(--text-muted);">Most Popular Dishes</h4>
+                        <div style="flex-grow:1; position:relative;"><canvas id="popular-chart"></canvas></div>
+                    </div>
+
+                    <!-- Status distributions -->
+                    <div class="chart-box flex-col">
+                        <h4 style="margin-bottom: 12px; font-size:14px; text-transform:uppercase; color:var(--text-muted);">Order Status Distribution</h4>
+                        <div style="flex-grow:1; position:relative;"><canvas id="status-chart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script>
+        const currentUser = checkAccess(['admin']);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            renderAnalyticsCharts();
+        });
+
+        function renderAnalyticsCharts() {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const menu = JSON.parse(localStorage.getItem('menuItems')) || [];
+
+            // 1. Daily Revenue Chart Data (last 7 days)
+            const revenueMap = {};
+            // Init last 7 days with 0
+            for(let i=6; i>=0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dayKey = d.toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+                revenueMap[dayKey] = 0;
+            }
+
+            orders.forEach(o => {
+                if (o.status === 'Served') {
+                    const oDate = new Date(o.createdAt).toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+                    if (revenueMap[oDate] !== undefined) {
+                        revenueMap[oDate] += o.total;
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('revenue-chart'), {
+                type: 'line',
+                data: {
+                    labels: Object.keys(revenueMap),
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: Object.values(revenueMap),
+                        borderColor: '#2ed573',
+                        backgroundColor: 'rgba(46, 213, 115, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // 2. Sales by Category
+            const categoryMap = {};
+            orders.forEach(o => {
+                o.items.forEach(it => {
+                    // Match category from menu
+                    const dish = menu.find(m => m.id === it.id);
+                    const cat = dish ? dish.category : "Others";
+                    categoryMap[cat] = (categoryMap[cat] || 0) + (it.price * it.qty);
+                });
+            });
+
+            new Chart(document.getElementById('category-chart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryMap),
+                    datasets: [{
+                        data: Object.values(categoryMap),
+                        backgroundColor: ['#ff4757', '#2ed573', '#ffa502', '#1e90ff', '#a4b0be', '#747d8c', '#57606f']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } }
+                }
+            });
+
+            // 3. Popular Dishes (quantity)
+            const popularMap = {};
+            orders.forEach(o => {
+                o.items.forEach(it => {
+                    popularMap[it.name] = (popularMap[it.name] || 0) + it.qty;
+                });
+            });
+
+            // Sort dishes by count desc, get top 5
+            const topDishes = Object.entries(popularMap)
+                .sort((a,b) => b[1] - a[1])
+                .slice(0, 5);
+
+            new Chart(document.getElementById('popular-chart'), {
+                type: 'bar',
+                data: {
+                    labels: topDishes.map(x => x[0]),
+                    datasets: [{
+                        label: 'Qty Ordered',
+                        data: topDishes.map(x => x[1]),
+                        backgroundColor: '#1e90ff'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // 4. Order Status Distribution
+            const statusMap = { Placed: 0, Accepted: 0, Preparing: 0, Ready: 0, Served: 0, Cancelled: 0 };
+            orders.forEach(o => {
+                if (statusMap[o.status] !== undefined) {
+                    statusMap[o.status]++;
+                }
+            });
+
+            new Chart(document.getElementById('status-chart'), {
+                type: 'polarArea',
+                data: {
+                    labels: Object.keys(statusMap),
+                    datasets: [{
+                        data: Object.values(statusMap),
+                        backgroundColor: ['#ffa502', '#1e90ff', '#3742fa', '#2ed573', '#2f3542', '#ff4757']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

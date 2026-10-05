@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="menu-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-bowl-food"></i>
+                        <span>Menu Items</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="table-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-map"></i>
+                        <span>Tables & Layout</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Orders Master</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="staff-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Staff Directory</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="customers.html" class="sidebar-link">
+                        <i class="fa-solid fa-address-book"></i>
+                        <span>Customer Registry</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="analytics.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Analytics Insights</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Restaurant Administrative Panel</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">A</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Stats widgets -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-info">
+                            <h3 id="stat-revenue">₹0</h3>
+                            <p>Today's Revenue</p>
+                        </div>
+                        <div class="stat-card-icon success"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-info">
+                            <h3 id="stat-total-orders">0</h3>
+                            <p>Total Orders</p>
+                        </div>
+                        <div class="stat-card-icon info"><i class="fa-solid fa-clipboard-list"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-info">
+                            <h3 id="stat-active-reservations">0</h3>
+                            <p>Active Reservations</p>
+                        </div>
+                        <div class="stat-card-icon warning"><i class="fa-solid fa-chair"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-info">
+                            <h3 id="stat-staff-count">0</h3>
+                            <p>Staff Members</p>
+                        </div>
+                        <div class="stat-card-icon primary"><i class="fa-solid fa-users"></i></div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Today's bookings table -->
+                    <div class="card" style="padding:20px;">
+                        <h4 style="border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
+                            Active Floor Bookings
+                        </h4>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Res ID</th>
+                                        <th>Customer</th>
+                                        <th>Table ID</th>
+                                        <th>Capacity</th>
+                                        <th>Slot Details</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-booking-rows">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Action items feed -->
+                    <div class="card" style="padding:20px;">
+                        <h4 style="border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
+                            Recent Transactions
+                        </h4>
+                        <div class="flex-col" style="gap:12px;" id="dashboard-recent-orders">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script>
+        const currentUser = checkAccess(['admin']);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            loadAdminDashboard();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                loadAdminDashboard();
+            });
+        });
+
+        function loadAdminDashboard() {
+            const users = dbGet('users');
+            const menu = dbGet('menuItems');
+            const reservations = dbGet('reservations');
+            const orders = dbGet('orders');
+
+            // 1. Calculate values
+            const revenue = orders
+                .filter(o => o.status === 'Served')
+                .reduce((sum, o) => sum + o.total, 0);
+            
+            const staffCount = users.filter(u => u.role === 'staff').length;
+            const activeReservations = reservations.filter(r => r.status === 'Confirmed').length;
+
+            document.getElementById('stat-revenue').innerText = `₹${revenue.toLocaleString()}`;
+            document.getElementById('stat-total-orders').innerText = orders.length;
+            document.getElementById('stat-active-reservations').innerText = activeReservations;
+            document.getElementById('stat-staff-count').innerText = staffCount;
+
+            // 2. Load Bookings
+            const bookingBody = document.getElementById('dashboard-booking-rows');
+            bookingBody.innerHTML = '';
+            
+            const activeResList = reservations.filter(r => r.status === 'Confirmed');
+            if (activeResList.length === 0) {
+                bookingBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No active bookings.</td></tr>`;
+            } else {
+                [...activeResList].reverse().slice(0, 5).forEach(res => {
+                    bookingBody.innerHTML += `
+                        <tr>
+                            <td><strong>${res.reservationId}</strong></td>
+                            <td>${res.customerName}</td>
+                            <td>Table ${res.tableId}</td>
+                            <td>${res.guests} Guests</td>
+                            <td>${res.date} &bull; ${res.timeSlot}</td>
+                            <td><span class="badge badge-success">${res.status}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // 3. Load Recent Orders
+            const ordersFeed = document.getElementById('dashboard-recent-orders');
+            ordersFeed.innerHTML = '';
+
+            if (orders.length === 0) {
+                ordersFeed.innerHTML = `<p style="color:var(--text-muted); font-size:12px;">No historical orders yet.</p>`;
+            } else {
+                [...orders].reverse().slice(0, 5).forEach(o => {
+                    let badgeClass = 'badge-info';
+                    if (o.status === 'Served') badgeClass = 'badge-success';
+                    else if (o.status === 'Cancelled') badgeClass = 'badge-danger';
+                    else if (o.status === 'Placed') badgeClass = 'badge-warning';
+
+                    ordersFeed.innerHTML += `
+                        <div style="border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px; font-size:13px;" class="flex justify-between align-center">
+                            <div>
+                                <strong>ID: ${o.orderId}</strong>
+                                <p style="font-size:11px; color:var(--text-muted);">${o.customerName} &bull; ${o.orderType}</p>
+                            </div>
+                            <div style="text-align:right;">
+                                <strong style="color:var(--primary);">₹${o.total}</strong>
+                                <br>
+                                <span class="badge ${badgeClass}" style="font-size:10px; padding:2px 6px;">${o.status}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+    </script>
+</body>
+</html>

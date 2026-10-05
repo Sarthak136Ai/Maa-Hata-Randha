@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders | Maa Hata Randha Staff</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .staff-orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .order-control-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+        .order-items-list {
+            margin: 12px 0;
+            padding: 10px 0;
+            border-top: 1px dashed var(--border-color);
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 13px;
+        }
+        .order-notes {
+            background-color: #fff9db;
+            border-left: 3px solid #ffa502;
+            padding: 8px 12px;
+            font-size: 12px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Manage Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="tables.html" class="sidebar-link">
+                        <i class="fa-solid fa-chair"></i>
+                        <span>Floor Layout</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="requests.html" class="sidebar-link">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>Assistance Calls</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Kitchen & Table Orders</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">S</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Floor Manager</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Status Filter Options -->
+                <div class="card flex align-center justify-between" style="padding:16px; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+                    <div class="flex align-center" style="gap:10px; flex-wrap:wrap;" id="filter-buttons">
+                        <button class="btn btn-primary btn-sm" onclick="setOrderFilter('active')">Active Orders</button>
+                        <button class="btn btn-outline btn-sm" onclick="setOrderFilter('Placed')">New (Placed)</button>
+                        <button class="btn btn-outline btn-sm" onclick="setOrderFilter('Accepted')">Accepted</button>
+                        <button class="btn btn-outline btn-sm" onclick="setOrderFilter('Preparing')">Preparing</button>
+                        <button class="btn btn-outline btn-sm" onclick="setOrderFilter('Ready')">Ready</button>
+                        <button class="btn btn-outline btn-sm" onclick="setOrderFilter('Served')">Served (Completed)</button>
+                        <button class="btn btn-outline btn-sm" onclick="setOrderFilter('All')">All History</button>
+                    </div>
+
+                    <div style="font-size:12px; color:var(--text-muted);">
+                        <i class="fa-solid fa-sync"></i> Auto-synced in real-time
+                    </div>
+                </div>
+
+                <!-- Orders Grid -->
+                <div class="staff-orders-grid" id="staff-orders-container">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/staff.js"></script>
+    <script>
+        const currentUser = checkAccess(['staff', 'admin']);
+        let currentFilter = 'active';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            loadStaffOrders();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                loadStaffOrders();
+            });
+        });
+
+        function setOrderFilter(filter) {
+            currentFilter = filter;
+            
+            const buttons = document.querySelectorAll('#filter-buttons button');
+            buttons.forEach(btn => {
+                if (btn.innerText.toLowerCase().includes(filter.toLowerCase())) {
+                    btn.className = "btn btn-primary btn-sm";
+                } else if (filter === 'active' && btn.innerText.includes('Active')) {
+                    btn.className = "btn btn-primary btn-sm";
+                } else {
+                    btn.className = "btn btn-outline btn-sm";
+                }
+            });
+
+            loadStaffOrders();
+        }
+
+        function loadStaffOrders() {
+            const orders = dbGet('orders');
+            const container = document.getElementById('staff-orders-container');
+            container.innerHTML = '';
+
+            let filtered = orders;
+            
+            if (currentFilter === 'active') {
+                filtered = orders.filter(o => !['Served', 'Cancelled'].includes(o.status));
+            } else if (currentFilter !== 'All') {
+                filtered = orders.filter(o => o.status === currentFilter);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align:center; padding: 40px; color:var(--text-muted);">
+                        <i class="fa-solid fa-receipt" style="font-size:36px; margin-bottom:12px;"></i>
+                        <p>No orders found under this status.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            [...filtered].reverse().forEach(o => {
+                const card = document.createElement('div');
+                card.className = 'order-control-card';
+
+                let itemsHtml = '';
+                o.items.forEach(it => {
+                    itemsHtml += `<div class="flex justify-between" style="margin-bottom:4px;"><span>${it.name} x${it.qty}</span><strong>₹${it.price * it.qty}</strong></div>`;
+                });
+
+                let notesHtml = '';
+                if (o.instructions) {
+                    notesHtml = `
+                        <div class="order-notes">
+                            <strong>Note:</strong> ${o.instructions}
+                        </div>
+                    `;
+                }
+
+                let actionHtml = '';
+                if (o.status === 'Placed') {
+                    actionHtml = `
+                        <div class="flex gap:10px" style="gap:10px; width:100%; margin-top:16px;">
+                            <button class="btn btn-primary btn-sm" style="flex-grow:1;" onclick="updateOrderState('${o.orderId}', 'Accepted')">Accept Order</button>
+                            <button class="btn btn-danger btn-sm" onclick="updateOrderState('${o.orderId}', 'Cancelled')">Cancel</button>
+                        </div>
+                    `;
+                } else if (o.status === 'Accepted') {
+                    actionHtml = `<button class="btn btn-info btn-sm" style="width:100%; margin-top:16px;" onclick="updateOrderState('${o.orderId}', 'Preparing')">Start Cooking (Preparing)</button>`;
+                } else if (o.status === 'Preparing') {
+                    actionHtml = `<button class="btn btn-warning btn-sm" style="width:100%; margin-top:16px; color:white;" onclick="updateOrderState('${o.orderId}', 'Ready')">Mark Ready (Ready)</button>`;
+                } else if (o.status === 'Ready') {
+                    actionHtml = `<button class="btn btn-success btn-sm" style="width:100%; margin-top:16px;" onclick="updateOrderState('${o.orderId}', 'Served')">Deliver (Served)</button>`;
+                } else {
+                    actionHtml = `
+                        <div style="font-size:12px; color:var(--text-muted); text-align:center; padding-top:12px; border-top:1px solid var(--border-color); width:100%;">
+                            Completed / Resolved
+                        </div>
+                    `;
+                }
+
+                let badgeClass = 'badge-warning';
+                if (o.status === 'Served') badgeClass = 'badge-success';
+                else if (o.status === 'Cancelled') badgeClass = 'badge-danger';
+                else if (o.status === 'Preparing') badgeClass = 'badge-info';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between align-center" style="margin-bottom:8px;">
+                            <strong>Order: ${o.orderId}</strong>
+                            <span class="badge ${badgeClass}">${o.status}</span>
+                        </div>
+                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">
+                            <strong>Customer:</strong> ${o.customerName}
+                        </p>
+                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+                            <strong>Type:</strong> ${o.orderType} ${o.tableId ? `&bull; Table ` + o.tableId : ''}
+                        </p>
+                        
+                        <div class="order-items-list">
+                            ${itemsHtml}
+                        </div>
+
+                        ${notesHtml}
+
+                        <div class="flex justify-between" style="font-size:14px; margin-bottom:12px;">
+                            <span>Total Bill:</span>
+                            <strong style="color:var(--primary);">₹${o.total}</strong>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        ${actionHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateOrderState(id, nextState) {
+            const res = changeOrderStatus(id, nextState);
+            if (res.success) {
+                showToast(`Order ${id} updated to ${nextState}!`, "success");
+                loadStaffOrders();
+            } else {
+                showToast(res.message, "error");
+            }
+        }
+    </script>
+</body>
+</html>

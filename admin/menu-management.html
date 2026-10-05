@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Management | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .menu-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="menu-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-bowl-food"></i>
+                        <span>Menu Items</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="table-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-map"></i>
+                        <span>Tables & Layout</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Orders Master</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="staff-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Staff Directory</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="customers.html" class="sidebar-link">
+                        <i class="fa-solid fa-address-book"></i>
+                        <span>Customer Registry</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="analytics.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Analytics Insights</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Menu Items Registry</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">A</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Control header -->
+                <div class="card flex justify-between align-center" style="padding:16px; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+                    <div class="flex align-center" style="gap:10px;">
+                        <input type="text" id="menu-search" class="form-control" placeholder="Search dishes..." oninput="loadMenuItemsTable()" style="width: 250px;">
+                        <select id="menu-cat-filter" class="form-control" onchange="loadMenuItemsTable()" style="width: 180px;">
+                            <option value="All">All Categories</option>
+                            <option value="Starters">Starters</option>
+                            <option value="Main Course">Main Course</option>
+                            <option value="Biryani">Biryani</option>
+                            <option value="Fast Foods">Fast Foods</option>
+                            <option value="Pizza">Pizza</option>
+                            <option value="Burgers">Burgers</option>
+                            <option value="Desserts">Desserts</option>
+                            <option value="Beverages">Beverages</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="openAddMenuModal()">
+                        <i class="fa-solid fa-plus"></i> Add New Dish
+                    </button>
+                </div>
+
+                <!-- Menu Table -->
+                <div class="card" style="padding: 20px;">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Thumbnail</th>
+                                    <th>Dish Name</th>
+                                    <th>Category</th>
+                                    <th>Diet Type</th>
+                                    <th>Price</th>
+                                    <th>Availability</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menu-items-table-rows">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="dish-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeDishModal()">&times;</button>
+            <h3 id="modal-title" style="margin-bottom: 20px;">Add Menu Item</h3>
+            
+            <form id="dish-form" onsubmit="handleDishSubmit(event)">
+                <input type="hidden" id="dish-id-field">
+                
+                <div class="form-group">
+                    <label class="form-label" for="dish-name">Dish Name</label>
+                    <input type="text" id="dish-name" class="form-control" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="dish-cat">Category</label>
+                        <select id="dish-cat" class="form-control" required>
+                            <option value="Starters">Starters</option>
+                            <option value="Main Course">Main Course</option>
+                            <option value="Biryani">Biryani</option>
+                            <option value="Fast Foods">Fast Foods</option>
+                            <option value="Pizza">Pizza</option>
+                            <option value="Burgers">Burgers</option>
+                            <option value="Desserts">Desserts</option>
+                            <option value="Beverages">Beverages</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="dish-price">Price (₹)</label>
+                        <input type="number" id="dish-price" class="form-control" required min="1">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="dish-diet">Diet Type</label>
+                        <select id="dish-diet" class="form-control" required>
+                            <option value="veg">Vegetarian</option>
+                            <option value="nonveg">Non-Vegetarian</option>
+                        </select>
+                    </div>
+                    <div class="form-group flex align-center" style="height:100%; padding-top:28px; gap:8px;">
+                        <input type="checkbox" id="dish-avail" checked style="width:18px; height:18px; accent-color:var(--primary);">
+                        <label for="dish-avail" style="font-weight:600; font-size:14px; cursor:pointer;">Available In Stock</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="dish-image">Image URL</label>
+                    <input type="url" id="dish-image" class="form-control" placeholder="https://unsplash.com/etc">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="dish-desc">Description</label>
+                    <textarea id="dish-desc" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding:12px; margin-top:10px;">
+                    Save Item Details
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        const currentUser = checkAccess(['admin']);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            loadMenuItemsTable();
+        });
+
+        function loadMenuItemsTable() {
+            const menu = JSON.parse(localStorage.getItem('menuItems')) || [];
+            const tbody = document.getElementById('menu-items-table-rows');
+            tbody.innerHTML = '';
+
+            const searchVal = document.getElementById('menu-search').value.toLowerCase().trim();
+            const catVal = document.getElementById('menu-cat-filter').value;
+
+            let filtered = menu;
+            if (catVal !== 'All') {
+                filtered = filtered.filter(item => item.category === catVal);
+            }
+            if (searchVal) {
+                filtered = filtered.filter(item => 
+                    item.name.toLowerCase().includes(searchVal) || 
+                    item.description.toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No dishes found in the registry.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const badgeDiet = item.isVeg ? 
+                    `<span class="badge badge-success">VEG</span>` : 
+                    `<span class="badge badge-danger">NON-VEG</span>`;
+
+                const badgeStock = item.available ? 
+                    `<span class="badge badge-success">In Stock</span>` : 
+                    `<span class="badge badge-danger">Out of Stock</span>`;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><img src="${item.image}" class="menu-thumb" alt="${item.name}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80';"></td>
+                        <td><strong>${item.name}</strong></td>
+                        <td>${item.category}</td>
+                        <td>${badgeDiet}</td>
+                        <td><strong>₹${item.price}</strong></td>
+                        <td>${badgeStock}</td>
+                        <td>
+                            <div class="flex" style="gap:8px;">
+                                <button class="btn btn-sm btn-outline" onclick="openEditMenuModal('${item.id}')">
+                                    <i class="fa-solid fa-pen"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteMenuAlert('${item.id}', '${item.name}')">
+                                    <i class="fa-solid fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openAddMenuModal() {
+            document.getElementById('dish-form').reset();
+            document.getElementById('dish-id-field').value = '';
+            document.getElementById('modal-title').innerText = "Add Menu Item";
+            document.getElementById('dish-modal').classList.add('active');
+        }
+
+        function openEditMenuModal(id) {
+            const menu = JSON.parse(localStorage.getItem('menuItems')) || [];
+            const item = menu.find(item => item.id === id);
+            if (!item) return;
+
+            document.getElementById('dish-id-field').value = item.id;
+            document.getElementById('dish-name').value = item.name;
+            document.getElementById('dish-cat').value = item.category;
+            document.getElementById('dish-price').value = item.price;
+            document.getElementById('dish-diet').value = item.isVeg ? 'veg' : 'nonveg';
+            document.getElementById('dish-avail').checked = item.available;
+            document.getElementById('dish-image').value = item.image;
+            document.getElementById('dish-desc').value = item.description;
+
+            document.getElementById('modal-title').innerText = "Edit Menu Item";
+            document.getElementById('dish-modal').classList.add('active');
+        }
+
+        function closeDishModal() {
+            document.getElementById('dish-modal').classList.remove('active');
+        }
+
+        function handleDishSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('dish-id-field').value;
+            const name = document.getElementById('dish-name').value.trim();
+            const category = document.getElementById('dish-cat').value;
+            const price = document.getElementById('dish-price').value;
+            const diet = document.getElementById('dish-diet').value;
+            const available = document.getElementById('dish-avail').checked;
+            const image = document.getElementById('dish-image').value.trim();
+            const description = document.getElementById('dish-desc').value.trim();
+
+            const dishData = {
+                name,
+                category,
+                price,
+                isVeg: diet === 'veg',
+                available,
+                image,
+                description
+            };
+
+            let res;
+            if (id) {
+                // Edit
+                res = adminEditMenuItem(id, dishData);
+                if (res.success) showToast("Dish details updated!", "success");
+            } else {
+                // Add
+                res = adminAddMenuItem(dishData);
+                if (res.success) showToast("New dish added to menu!", "success");
+            }
+
+            if (res && res.success) {
+                closeDishModal();
+                loadMenuItemsTable();
+            } else {
+                showToast(res.message || "Failed to save item.", "error");
+            }
+        }
+
+        function deleteMenuAlert(id, name) {
+            if (confirm(`Are you sure you want to delete ${name} from the menu? This action is permanent.`)) {
+                const res = adminDeleteMenuItem(id);
+                if (res.success) {
+                    showToast(`${name} deleted from menu.`, "info");
+                    loadMenuItemsTable();
+                } else {
+                    showToast(res.message, "error");
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Cart | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .cart-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 992px) {
+            .cart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .cart-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+            gap: 16px;
+        }
+        .cart-item-row:last-child {
+            border-bottom: none;
+        }
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .qty-btn {
+            background-color: #fafbfe;
+            border: none;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .qty-btn:hover {
+            background-color: var(--border-color);
+        }
+        .qty-val {
+            width: 36px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .cart-summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .coupon-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-gauge"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="menu.html" class="sidebar-link">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                        <span>Digital Menu</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="reservation.html" class="sidebar-link">
+                        <i class="fa-solid fa-chair"></i>
+                        <span>Book Table</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="cart.html" class="sidebar-link">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span>Active Cart</span>
+                        <span id="sidebar-cart-badge" class="badge badge-danger" style="margin-left: auto; display: none;">0</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Track Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="profile.html" class="sidebar-link">
+                        <i class="fa-solid fa-user-gear"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Active Cart</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Premium Guest</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="cart-grid" id="cart-grid-container" style="display: none;">
+                    <!-- Cart list panel -->
+                    <div class="card flex flex-col">
+                        <h4 style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                            Shopping Bag
+                        </h4>
+                        <div id="cart-items-list" class="flex-grow">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Checkout Summary panel -->
+                    <div class="flex-col" style="gap: 24px;">
+                        <!-- Promo Voucher -->
+                        <div class="card">
+                            <h4 style="margin-bottom: 12px;">Apply Voucher</h4>
+                            <div class="coupon-box">
+                                <input type="text" id="coupon-input" class="form-control" placeholder="Promo Code">
+                                <button class="btn btn-outline" onclick="applyCoupon()">Apply</button>
+                            </div>
+                            <p style="font-size:12px; color:var(--text-muted);">Try entering "GUSTOFEST" to save 15%.</p>
+                        </div>
+
+                        <!-- Price Breakdown & Checkout -->
+                        <div class="card">
+                            <h4 style="margin-bottom: 16px;">Summary</h4>
+                            <div class="cart-summary-item">
+                                <span>Subtotal</span>
+                                <span id="cart-subtotal">₹0</span>
+                            </div>
+                            <div class="cart-summary-item">
+                                <span>Tax (GST 5%)</span>
+                                <span id="cart-tax">₹0</span>
+                            </div>
+                            <div class="cart-summary-item" id="discount-row" style="display: none; color: var(--success); font-weight: 500;">
+                                <span>Discount</span>
+                                <span id="cart-discount">-₹0</span>
+                            </div>
+                            <hr style="border: none; border-top: 1px solid var(--border-color); margin: 12px 0;">
+                            <div class="cart-summary-item" style="font-size: 16px; font-weight: 700;">
+                                <span>Total Bill</span>
+                                <span id="cart-total" style="color: var(--primary);">₹0</span>
+                            </div>
+
+                            <form id="checkout-form" style="margin-top: 24px;" onsubmit="handleCheckout(event)">
+                                <div class="form-group">
+                                    <label class="form-label">Order Type</label>
+                                    <select id="checkout-type" class="form-control" onchange="toggleTableSelection()" required>
+                                        <option value="Takeaway">Takeaway</option>
+                                        <option value="Dine-in">Dine-in</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="table-select-group" style="display: none;">
+                                    <label class="form-label">Select Reserved Table</label>
+                                    <select id="checkout-table" class="form-control">
+                                        <option value="">-- Choose Table --</option>
+                                        <!-- Populated with today's reservations or list of tables -->
+                                    </select>
+                                    <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+                                        Select one of your bookings, or specify any open table.
+                                    </p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Special Cooking Instructions</label>
+                                    <textarea id="checkout-notes" class="form-control" rows="3" placeholder="No spicy, extra cheese, cutlery, etc."></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                                    Place Order
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div class="card" id="empty-cart-state" style="text-align: center; padding: 60px 40px;">
+                    <i class="fa-solid fa-basket-shopping" style="font-size: 50px; color: var(--text-muted); margin-bottom: 20px;"></i>
+                    <h3>Your Cart is Empty</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                        Explore our menu of fresh dishes and select something delicious to satisfy your cravings.
+                    </p>
+                    <a href="menu.html" class="btn btn-primary">Browse Menu</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="order-success-modal">
+        <div class="modal-content text-center" style="text-align: center;">
+            <i class="fa-solid fa-circle-check" style="font-size: 50px; color: var(--success); margin-bottom: 16px;"></i>
+            <h3>Order Placed Successfully!</h3>
+            <p style="color: var(--text-muted); margin: 12px 0 20px 0;">
+                Your order <strong id="modal-order-id" style="color: var(--secondary);">ORD000</strong> has been sent to the kitchen.
+            </p>
+            <button class="btn btn-primary" onclick="closeModalAndTrack()" style="width: 100%;">
+                Track Order Status
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/cart.js"></script>
+    <script>
+        const currentUser = checkAccess(['customer']);
+        let couponApplied = "";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            renderCart();
+            updateCartBadge();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                populateTablesOptions();
+            });
+        });
+
+        function renderCart() {
+            const cart = getCart(currentUser.id);
+            const gridContainer = document.getElementById('cart-grid-container');
+            const emptyContainer = document.getElementById('empty-cart-state');
+
+            if (cart.length === 0) {
+                gridContainer.style.display = 'none';
+                emptyContainer.style.display = 'block';
+                return;
+            }
+
+            gridContainer.style.display = 'grid';
+            emptyContainer.style.display = 'none';
+
+            const itemsContainer = document.getElementById('cart-items-list');
+            itemsContainer.innerHTML = '';
+
+            cart.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'cart-item-row';
+                row.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <h4 style="margin-bottom: 4px;">${item.name}</h4>
+                        <span style="color: var(--primary); font-weight:600; font-size:14px;">₹${item.price} each</span>
+                    </div>
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
+                        <span class="qty-val">${item.qty}</span>
+                        <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                    </div>
+                    <div style="width: 80px; text-align: right;">
+                        <strong style="font-size:15px;">₹${item.price * item.qty}</strong>
+                    </div>
+                    <button class="btn btn-sm btn-outline" onclick="removeItem('${item.id}')" style="border:none; color:var(--danger); padding:6px 10px;">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                itemsContainer.appendChild(row);
+            });
+
+            updatePricingBreakdown();
+            populateTablesOptions();
+        }
+
+        function updateQty(id, change) {
+            let cart = getCart(currentUser.id);
+            const item = cart.find(item => item.id === id);
+            if (!item) return;
+
+            item.qty += change;
+            if (item.qty <= 0) {
+                cart = cart.filter(item => item.id !== id);
+            }
+
+            saveCart(currentUser.id, cart);
+            renderCart();
+            updateCartBadge();
+        }
+
+        function removeItem(id) {
+            let cart = getCart(currentUser.id);
+            cart = cart.filter(item => item.id !== id);
+            saveCart(currentUser.id, cart);
+            renderCart();
+            updateCartBadge();
+            showToast("Item removed from cart.", "info");
+        }
+
+        function updatePricingBreakdown() {
+            const cart = getCart(currentUser.id);
+            const totals = calculateCartTotals(cart, couponApplied);
+
+            document.getElementById('cart-subtotal').innerText = `₹${totals.subtotal}`;
+            document.getElementById('cart-tax').innerText = `₹${totals.tax}`;
+            
+            const discountRow = document.getElementById('discount-row');
+            if (totals.discount > 0) {
+                document.getElementById('cart-discount').innerText = `-₹${totals.discount}`;
+                discountRow.style.display = 'flex';
+            } else {
+                discountRow.style.display = 'none';
+            }
+
+            document.getElementById('cart-total').innerText = `₹${totals.total}`;
+        }
+
+        function applyCoupon() {
+            const code = document.getElementById('coupon-input').value.trim();
+            if (!code) {
+                showToast("Please enter a voucher code.", "warning");
+                return;
+            }
+
+            if (code.toUpperCase() === 'GUSTOFEST') {
+                couponApplied = code;
+                updatePricingBreakdown();
+                showToast("Voucher code GUSTOFEST applied! Saved 15%.", "success");
+            } else {
+                showToast("Invalid coupon code.", "error");
+            }
+        }
+
+        function toggleTableSelection() {
+            const type = document.getElementById('checkout-type').value;
+            const tableGroup = document.getElementById('table-select-group');
+            const tableSelect = document.getElementById('checkout-table');
+
+            if (type === 'Dine-in') {
+                tableGroup.style.display = 'block';
+                tableSelect.setAttribute('required', 'true');
+            } else {
+                tableGroup.style.display = 'none';
+                tableSelect.removeAttribute('required');
+            }
+        }
+
+        function populateTablesOptions() {
+            const select = document.getElementById('checkout-table');
+            if (!select) return;
+            select.innerHTML = '<option value="">-- Choose Table --</option>';
+
+            // Load bookings for this customer
+            const reservations = dbGet('reservations');
+            const todayStr = new Date().toISOString().split('T')[0];
+            const myBookingsToday = reservations.filter(r => 
+                r.customerId === currentUser.id && 
+                r.date === todayStr && 
+                r.status === 'Confirmed'
+            );
+
+            if (myBookingsToday.length > 0) {
+                const optGroup = document.createElement('optgroup');
+                optGroup.label = "Your Bookings Today";
+                myBookingsToday.forEach(r => {
+                    optGroup.innerHTML += `<option value="${r.tableId}">Table ${r.tableId} (${r.timeSlot})</option>`;
+                });
+                select.appendChild(optGroup);
+            }
+
+            // Also load all generic tables
+            const tables = dbGet('tables');
+            const optGroupAll = document.createElement('optgroup');
+            optGroupAll.label = "All Tables";
+            tables.forEach(t => {
+                if (t.status === 'Available') {
+                    optGroupAll.innerHTML += `<option value="${t.id}">Table ${t.number} (${t.capacity} seats, ${t.section})</option>`;
+                }
+            });
+            select.appendChild(optGroupAll);
+        }
+
+        function handleCheckout(e) {
+            e.preventDefault();
+            const cart = getCart(currentUser.id);
+            if (cart.length === 0) {
+                showToast("Cart is empty.", "error");
+                return;
+            }
+
+            const type = document.getElementById('checkout-type').value;
+            const tableId = document.getElementById('checkout-table').value;
+            const instructions = document.getElementById('checkout-notes').value.trim();
+
+            if (type === 'Dine-in' && !tableId) {
+                showToast("Please choose a table for Dine-in orders.", "warning");
+                return;
+            }
+
+            const totals = calculateCartTotals(cart, couponApplied);
+            const orders = dbGet('orders');
+
+            // Generate unique Order ID
+            const newOrderId = "ORD" + Math.floor(1000 + Math.random() * 9000);
+
+            const newOrder = {
+                orderId: newOrderId,
+                customerId: currentUser.id,
+                customerName: currentUser.name,
+                items: cart,
+                orderType: type,
+                tableId: type === 'Dine-in' ? tableId : "",
+                subtotal: totals.subtotal,
+                tax: totals.tax,
+                discount: totals.discount,
+                total: totals.total,
+                status: "Placed",
+                createdAt: new Date().toISOString(),
+                instructions: instructions
+            };
+
+            orders.push(newOrder);
+            dbSet('orders', orders);
+
+            // Clear Cart
+            clearCart(currentUser.id);
+            updateCartBadge();
+
+            // Open Modal
+            document.getElementById('modal-order-id').innerText = newOrderId;
+            document.getElementById('order-success-modal').classList.add('active');
+        }
+
+        function closeModalAndTrack() {
+            document.getElementById('order-success-modal').classList.remove('active');
+            window.location.href = 'orders.html';
+        }
+
+        function updateCartBadge() {
+            const cart = getCart(currentUser.id);
+            const badge = document.getElementById('sidebar-cart-badge');
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            if (totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Directory | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="menu-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-bowl-food"></i>
+                        <span>Menu Items</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="table-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-map"></i>
+                        <span>Tables & Layout</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Orders Master</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="staff-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Staff Directory</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="customers.html" class="sidebar-link">
+                        <i class="fa-solid fa-address-book"></i>
+                        <span>Customer Registry</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="analytics.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Analytics Insights</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Employee Management Directory</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">A</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Control bar -->
+                <div class="card flex justify-between align-center" style="padding:16px; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+                    <div class="flex align-center" style="gap:10px;">
+                        <input type="text" id="staff-search" class="form-control" placeholder="Search by name/email..." oninput="loadStaffTable()" style="width: 250px;">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="openAddStaffModal()">
+                        <i class="fa-solid fa-user-plus"></i> Add Staff Account
+                    </button>
+                </div>
+
+                <!-- Staff Table -->
+                <div class="card" style="padding:20px;">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Staff ID</th>
+                                    <th>Name</th>
+                                    <th>Email Address</th>
+                                    <th>Assigned Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staff-table-rows">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Staff Modal -->
+    <div class="modal" id="staff-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeStaffModal()">&times;</button>
+            <h3 id="staff-modal-title" style="margin-bottom: 20px;">Register Staff Account</h3>
+            
+            <form id="staff-form" onsubmit="handleStaffSubmit(event)">
+                <input type="hidden" id="staff-id-field">
+                
+                <div class="form-group">
+                    <label class="form-label" for="staff-name">Full Name</label>
+                    <input type="text" id="staff-name" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="staff-email">Email Address</label>
+                    <input type="email" id="staff-email" class="form-control" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="staff-pass">Account Password</label>
+                        <input type="password" id="staff-pass" class="form-control" placeholder="••••••••" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="staff-role">Staff Work Role</label>
+                        <select id="staff-role" class="form-control" required>
+                            <option value="Waiter">Waiter</option>
+                            <option value="Chef">Chef</option>
+                            <option value="Manager">Manager</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding:12px; margin-top:10px;">
+                    Save Employee Profile
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        const currentUser = checkAccess(['admin']);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            loadStaffTable();
+        });
+
+        function loadStaffTable() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const tbody = document.getElementById('staff-table-rows');
+            tbody.innerHTML = '';
+
+            const searchVal = document.getElementById('staff-search').value.toLowerCase().trim();
+            const staffList = users.filter(u => u.role === 'staff');
+
+            let filtered = staffList;
+            if (searchVal) {
+                filtered = filtered.filter(u => 
+                    u.name.toLowerCase().includes(searchVal) || 
+                    u.email.toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No staff members found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(s => {
+                let roleBadge = '<span class="badge badge-info">Waiter</span>';
+                if (s.staffRole === 'Chef') roleBadge = '<span class="badge badge-warning">Chef</span>';
+                else if (s.staffRole === 'Manager') roleBadge = '<span class="badge badge-success">Manager</span>';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${s.id}</strong></td>
+                        <td>${s.name}</td>
+                        <td>${s.email}</td>
+                        <td>${roleBadge}</td>
+                        <td>
+                            <div class="flex" style="gap:8px;">
+                                <button class="btn btn-sm btn-outline" onclick="openEditStaffModal('${s.id}')">
+                                    <i class="fa-solid fa-user-pen"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteStaffAlert('${s.id}', '${s.name}')">
+                                    <i class="fa-solid fa-user-minus"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openAddStaffModal() {
+            document.getElementById('staff-form').reset();
+            document.getElementById('staff-id-field').value = '';
+            document.getElementById('staff-pass').setAttribute('required', 'true');
+            document.getElementById('staff-modal-title').innerText = "Register Staff Account";
+            document.getElementById('staff-modal').classList.add('active');
+        }
+
+        function openEditStaffModal(id) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const staff = users.find(u => u.id === id);
+            if (!staff) return;
+
+            document.getElementById('staff-id-field').value = staff.id;
+            document.getElementById('staff-name').value = staff.name;
+            document.getElementById('staff-email').value = staff.email;
+            document.getElementById('staff-pass').removeAttribute('required');
+            document.getElementById('staff-pass').value = staff.password; // fill active
+            document.getElementById('staff-role').value = staff.staffRole || 'Waiter';
+
+            document.getElementById('staff-modal-title').innerText = "Edit Staff Profile";
+            document.getElementById('staff-modal').classList.add('active');
+        }
+
+        function closeStaffModal() {
+            document.getElementById('staff-modal').classList.remove('active');
+        }
+
+        function handleStaffSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('staff-id-field').value;
+            const name = document.getElementById('staff-name').value.trim();
+            const email = document.getElementById('staff-email').value.trim();
+            const password = document.getElementById('staff-pass').value;
+            const staffRole = document.getElementById('staff-role').value;
+
+            const staffData = {
+                name,
+                email,
+                password,
+                staffRole
+            };
+
+            let res;
+            if (id) {
+                res = adminEditStaff(id, staffData);
+                if (res.success) showToast("Employee credentials updated!", "success");
+            } else {
+                res = adminAddStaff(staffData);
+                if (res.success) showToast("New staff account registered!", "success");
+            }
+
+            if (res && res.success) {
+                closeStaffModal();
+                loadStaffTable();
+            } else {
+                showToast(res.message || "Failed to save profile.", "error");
+            }
+        }
+
+        function deleteStaffAlert(id, name) {
+            if (confirm(`Are you sure you want to revoke system access for ${name}?`)) {
+                const res = adminDeleteStaff(id);
+                if (res.success) {
+                    showToast(`${name} removed from registry.`, "info");
+                    loadStaffTable();
+                } else {
+                    showToast(res.message, "error");
+                }
+            }
+        }
+    </script>
+</body>
+</html>

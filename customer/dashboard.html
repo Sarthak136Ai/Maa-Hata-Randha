@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .offer-card {
+            background: linear-gradient(135deg, var(--primary) 0%, #ff6b81 100%);
+            color: white;
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+        }
+        .offer-card::after {
+            content: '\f2e7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: -20px;
+            bottom: -30px;
+            font-size: 150px;
+            opacity: 0.1;
+        }
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .food-card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .food-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .food-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .food-details {
+            padding: 20px;
+        }
+        .food-tag {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        .tag-veg { background-color: rgba(46, 213, 115, 0.15); color: #2ed573; }
+        .tag-nonveg { background-color: rgba(255, 71, 87, 0.15); color: #ff4757; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-gauge"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="menu.html" class="sidebar-link">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                        <span>Digital Menu</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="reservation.html" class="sidebar-link">
+                        <i class="fa-solid fa-chair"></i>
+                        <span>Book Table</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="cart.html" class="sidebar-link">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span>Active Cart</span>
+                        <span id="sidebar-cart-badge" class="badge badge-danger" style="margin-left: auto; display: none;">0</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Track Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="profile.html" class="sidebar-link">
+                        <i class="fa-solid fa-user-gear"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3 id="welcome-text">Welcome back!</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Premium Guest</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Promo banner -->
+                <div class="offer-card">
+                    <div>
+                        <h2 style="color: white; margin-bottom: 8px;">Enjoy 15% Off Your First Dine-in Booking!</h2>
+                        <p style="opacity: 0.9; margin-bottom: 16px;">Use voucher code <strong>MAAHATA15</strong> at cart checkout.</p>
+                        <a href="reservation.html" class="btn btn-secondary" style="background-color: var(--secondary); color: white;">Book Table</a>
+                    </div>
+                </div>
+
+                <!-- Stats widgets -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-info">
+                            <h3 id="stat-active-orders">0</h3>
+                            <p>Active Orders</p>
+                        </div>
+                        <div class="stat-card-icon info"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-info">
+                            <h3 id="stat-active-reservations">0</h3>
+                            <p>Upcoming Bookings</p>
+                        </div>
+                        <div class="stat-card-icon success"><i class="fa-solid fa-calendar-check"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-info">
+                            <h3 id="stat-loyalty-points">320</h3>
+                            <p>Dine Points</p>
+                        </div>
+                        <div class="stat-card-icon warning"><i class="fa-solid fa-award"></i></div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Featured & Fast Ordering section -->
+                    <div>
+                        <div class="flex justify-between align-center" style="margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <h3 style="margin-bottom: 2px;">Explore Dishes & Fast Order</h3>
+                                <p style="color: var(--text-muted); font-size: 13px;">Browse chef specials, fast food, beverages, desserts & more</p>
+                            </div>
+                            <a href="menu.html" class="btn btn-outline btn-sm" style="font-weight: 600;">
+                                View Full Menu <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
+                            </a>
+                        </div>
+
+                        <!-- Filter Deck -->
+                        <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+                            <!-- Category Pills -->
+                            <div class="category-tabs" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px;">
+                                <button type="button" class="btn btn-sm btn-primary cat-tab active" onclick="setDashboardCategory('All', this)">All (37)</button>
+                                <button type="button" class="btn btn-sm btn-outline cat-tab" onclick="setDashboardCategory('Starters', this)">Starters</button>
+                                <button type="button" class="btn btn-sm btn-outline cat-tab" onclick="setDashboardCategory('Main Course', this)">Main Course</button>
+                                <button type="button" class="btn btn-sm btn-outline cat-tab" onclick="setDashboardCategory('Fast Foods', this)">Fast Foods</button>
+                                <button type="button" class="btn btn-sm btn-outline cat-tab" onclick="setDashboardCategory('Biryani', this)">Biryani</button>
+                                <button type="button" class="btn btn-sm btn-outline cat-tab" onclick="setDashboardCategory('Desserts', this)">Desserts</button>
+                                <button type="button" class="btn btn-sm btn-outline cat-tab" onclick="setDashboardCategory('Beverages', this)">Beverages</button>
+                            </div>
+
+                            <!-- Search & Diet Filters -->
+                            <div class="flex justify-between align-center" style="flex-wrap: wrap; gap: 10px;">
+                                <div style="position: relative; flex: 1; min-width: 200px;">
+                                    <input type="text" id="dash-dish-search" class="form-control" placeholder="Search dishes (e.g. Pizza, Burger, Paneer, Biryani)..." oninput="renderDashboardDishes()" style="padding-left: 34px;">
+                                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px;"></i>
+                                </div>
+                                <div class="flex align-center" style="gap: 8px;">
+                                    <button type="button" class="btn btn-sm btn-secondary diet-tab active" onclick="setDashboardDiet('all', this)">All</button>
+                                    <button type="button" class="btn btn-sm btn-outline diet-tab" onclick="setDashboardDiet('veg', this)" style="color: #2ed573; border-color: #2ed573;">🌱 Veg</button>
+                                    <button type="button" class="btn btn-sm btn-outline diet-tab" onclick="setDashboardDiet('nonveg', this)" style="color: #ff4757; border-color: #ff4757;">🍗 Non-Veg</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dishes Grid -->
+                        <div class="featured-grid" id="featured-dishes">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Active Tracker widget -->
+                    <div>
+                        <h3 style="margin-bottom: 10px;">Recent Activity</h3>
+                        <div class="card" id="activity-widget" style="padding: 20px; margin-bottom: 24px;">
+                            <p style="color: var(--text-muted); font-size: 14px;">No active orders or reservations right now.</p>
+                        </div>
+
+                        <!-- Quick Category Shortcuts Banner -->
+                        <div style="background: linear-gradient(135deg, rgba(255, 71, 87, 0.08), rgba(47, 53, 66, 0.04)); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 18px;">
+                            <h4 style="margin-bottom: 10px; font-size: 14px;"><i class="fa-solid fa-utensils" style="color: var(--primary);"></i> Popular Quick Picks</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                <span class="badge" style="background: white; border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; padding: 6px 10px;" onclick="quickFilterDash('Pizza')">🍕 Pizzas</span>
+                                <span class="badge" style="background: white; border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; padding: 6px 10px;" onclick="quickFilterDash('Burger')">🍔 Burgers</span>
+                                <span class="badge" style="background: white; border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; padding: 6px 10px;" onclick="quickFilterDash('Biryani')">🍚 Biryani</span>
+                                <span class="badge" style="background: white; border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; padding: 6px 10px;" onclick="quickFilterDash('Tandoori')">🍢 Starters</span>
+                                <span class="badge" style="background: white; border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; padding: 6px 10px;" onclick="quickFilterDash('Cake')">🍰 Desserts</span>
+                                <span class="badge" style="background: white; border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; padding: 6px 10px;" onclick="quickFilterDash('Coffee')">🥤 Beverages</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Check access
+        const currentUser = checkAccess(['customer']);
+        let activeDashCategory = 'All';
+        let activeDashDiet = 'all'; // 'all', 'veg', 'nonveg'
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            
+            // Set User profile strings
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('welcome-text').innerText = `Welcome back, ${currentUser.name}!`;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            // Load counts
+            loadDashboardStats();
+            renderDashboardDishes();
+            updateCartBadge();
+
+            // Listen for cross-browser / real-time updates
+            window.addEventListener('db_updated', () => {
+                loadDashboardStats();
+                renderDashboardDishes();
+            });
+        });
+
+        function setDashboardCategory(cat, btn) {
+            activeDashCategory = cat;
+            document.querySelectorAll('.cat-tab').forEach(b => {
+                b.classList.remove('btn-primary', 'active');
+                b.classList.add('btn-outline');
+            });
+            btn.classList.remove('btn-outline');
+            btn.classList.add('btn-primary', 'active');
+            renderDashboardDishes();
+        }
+
+        function setDashboardDiet(diet, btn) {
+            activeDashDiet = diet;
+            document.querySelectorAll('.diet-tab').forEach(b => {
+                b.classList.remove('btn-secondary', 'btn-success', 'btn-danger', 'active');
+                b.classList.add('btn-outline');
+            });
+            btn.classList.remove('btn-outline');
+            btn.classList.add('btn-secondary', 'active');
+            renderDashboardDishes();
+        }
+
+        function quickFilterDash(query) {
+            const searchInput = document.getElementById('dash-dish-search');
+            searchInput.value = query;
+            renderDashboardDishes();
+        }
+
+        function loadDashboardStats() {
+            const orders = dbGet('orders');
+            const reservations = dbGet('reservations');
+
+            const activeOrders = orders.filter(o => o.customerId === currentUser.id && !['Served', 'Cancelled'].includes(o.status));
+            const upcomingBookings = reservations.filter(r => r.customerId === currentUser.id && r.status === 'Confirmed');
+
+            document.getElementById('stat-active-orders').innerText = activeOrders.length;
+            document.getElementById('stat-active-reservations').innerText = upcomingBookings.length;
+
+            const activityBox = document.getElementById('activity-widget');
+            activityBox.innerHTML = '';
+
+            if (activeOrders.length > 0) {
+                const latest = activeOrders[0];
+                activityBox.innerHTML += `
+                    <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 12px;">
+                        <span class="badge badge-info" style="margin-bottom: 6px;">Order Active</span>
+                        <p style="font-weight:600; font-size:14px; margin-bottom:2px;">ID: ${latest.orderId}</p>
+                        <p style="font-size:12px; color:var(--text-muted);">Status: <strong>${latest.status}</strong></p>
+                        <a href="orders.html" style="font-size:12px; font-weight:600; display:inline-block; margin-top:8px;">Track Order <i class="fa-solid fa-angle-right"></i></a>
+                    </div>
+                `;
+            }
+
+            if (upcomingBookings.length > 0) {
+                const latest = upcomingBookings[0];
+                activityBox.innerHTML += `
+                    <div>
+                        <span class="badge badge-success" style="margin-bottom: 6px;">Table Reserved</span>
+                        <p style="font-weight:600; font-size:14px; margin-bottom:2px;">Table ${latest.tableId} (${latest.guests} Seats)</p>
+                        <p style="font-size:12px; color:var(--text-muted);">${latest.date} at ${latest.timeSlot}</p>
+                        <a href="reservation.html" style="font-size:12px; font-weight:600; display:inline-block; margin-top:8px;">Manage Booking <i class="fa-solid fa-angle-right"></i></a>
+                    </div>
+                `;
+            }
+
+            if (activeOrders.length === 0 && upcomingBookings.length === 0) {
+                activityBox.innerHTML = `<p style="color: var(--text-muted); font-size: 14px;">No active orders or reservations right now. Order some food or book a table to get started!</p>`;
+            }
+        }
+
+        function renderDashboardDishes() {
+            const menu = dbGet('menuItems');
+            const searchVal = (document.getElementById('dash-dish-search')?.value || '').toLowerCase().trim();
+            const container = document.getElementById('featured-dishes');
+            if (!container) return;
+
+            let filtered = [...menu].filter(dish => dish.available !== false);
+
+            if (activeDashCategory !== 'All') {
+                filtered = filtered.filter(d => d.category === activeDashCategory);
+            }
+
+            if (activeDashDiet === 'veg') {
+                filtered = filtered.filter(d => d.isVeg === true);
+            } else if (activeDashDiet === 'nonveg') {
+                filtered = filtered.filter(d => d.isVeg === false);
+            }
+
+            if (searchVal) {
+                filtered = filtered.filter(d => 
+                    d.name.toLowerCase().includes(searchVal) || 
+                    d.description.toLowerCase().includes(searchVal) ||
+                    d.category.toLowerCase().includes(searchVal)
+                );
+            }
+
+            // If "All" and no search, show top rated dishes (up to 9), otherwise all filtered results
+            const displayList = (activeDashCategory === 'All' && !searchVal && activeDashDiet === 'all')
+                ? filtered.sort((a, b) => b.rating - a.rating).slice(0, 9)
+                : filtered;
+
+            if (displayList.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                        <i class="fa-solid fa-utensils" style="font-size: 36px; color: var(--text-muted); margin-bottom: 12px;"></i>
+                        <p style="font-weight: 600; color: var(--text-main);">No dishes match your selection.</p>
+                        <p style="color: var(--text-muted); font-size: 13px;">Try switching categories or clearing search filters.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = displayList.map(dish => `
+                <div class="food-card">
+                    <div style="position: relative;">
+                        <img src="${dish.image}" class="food-img" alt="${dish.name}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80';">
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #ffa502; padding: 3px 8px; border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                            <i class="fa-solid fa-star"></i> ${dish.rating}
+                        </div>
+                    </div>
+                    <div class="food-details">
+                        <div class="flex justify-between align-center" style="margin-bottom: 6px;">
+                            <span class="food-tag ${dish.isVeg ? 'tag-veg' : 'tag-nonveg'}">
+                                <i class="fa-solid ${dish.isVeg ? 'fa-leaf' : 'fa-drumstick-bite'}"></i> ${dish.isVeg ? 'VEG' : 'NON-VEG'}
+                            </span>
+                            <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">${dish.category}</span>
+                        </div>
+                        <h4 style="margin-bottom:6px; font-size: 15px;">${dish.name}</h4>
+                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; height: 36px; overflow:hidden; line-height: 1.4;">${dish.description}</p>
+                        <div class="flex justify-between align-center" style="border-top: 1px dashed var(--border-color); padding-top: 12px;">
+                            <strong style="color:var(--primary); font-size:18px;">₹${dish.price}</strong>
+                            <button class="btn btn-primary btn-sm" onclick="addToCartDirect('${dish.id}')">
+                                <i class="fa-solid fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCartDirect(id) {
+            const menu = dbGet('menuItems');
+            const dish = menu.find(item => item.id === id);
+            if (!dish) return;
+
+            let cart = JSON.parse(localStorage.getItem('cart_' + currentUser.id)) || [];
+            const exist = cart.find(item => item.id === id);
+
+            if (exist) {
+                exist.qty++;
+            } else {
+                cart.push({
+                    id: dish.id,
+                    name: dish.name,
+                    price: dish.price,
+                    qty: 1
+                });
+            }
+
+            localStorage.setItem('cart_' + currentUser.id, JSON.stringify(cart));
+            updateCartBadge();
+            showToast(`Added ${dish.name} to cart!`, "success");
+        }
+
+        function updateCartBadge() {
+            const cart = JSON.parse(localStorage.getItem('cart_' + currentUser.id)) || [];
+            const badge = document.getElementById('sidebar-cart-badge');
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            if (totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

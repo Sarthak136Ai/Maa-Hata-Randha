@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maa Hata Randha | Smart Restaurant & Service Management</title>
+    <meta name="description" content="Experience premium dine-in service, instant online ordering, and interactive table bookings at Maa Hata Randha.">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        .hero-banner {
+            max-width: 800px;
+            margin: 40px auto 0 auto;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .hero-banner img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .landing-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        .feature-card {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        .feature-icon {
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        .cta-box {
+            background-color: var(--secondary);
+            color: var(--text-light);
+            border-radius: var(--radius-lg);
+            padding: 50px;
+            text-align: center;
+            margin: 60px 0;
+        }
+        .cta-box h2 {
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-size: 32px;
+        }
+        .cta-box p {
+            margin-bottom: 30px;
+            opacity: 0.8;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .cta-btns {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        @media(max-width: 576px) {
+            .cta-btns {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="landing-header">
+        <div class="container flex justify-between align-center">
+            <a href="index.html" class="logo">
+                <i class="fa-solid fa-utensils"></i>
+                Maa Hata<span>Randha</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="app.html" style="color:var(--primary); font-weight:700;"><i class="fa-brands fa-react"></i> React App</a></li>
+                <li><a href="#features">Services</a></li>
+                <li><a href="login.html" class="btn btn-outline btn-sm">Sign In</a></li>
+                <li><a href="register.html" class="btn btn-primary btn-sm">Register</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-section">
+            <h1 class="hero-title">Experience dining, elevated.</h1>
+            <p class="hero-subtitle">Book your favorite table dynamically or order culinary delights online with our smart real-time restaurant service system.</p>
+            <div class="flex justify-between align-center" style="justify-content: center; gap: 16px; flex-wrap: wrap;">
+                <a href="app.html" class="btn btn-primary" style="box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);"><i class="fa-brands fa-react"></i> Launch React App</a>
+                <a href="login.html" class="btn btn-secondary">Traditional Portals</a>
+            </div>
+            <div class="hero-banner">
+                <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=80" alt="Restaurant Interior">
+            </div>
+        </section>
+
+        <section id="features">
+            <h2 class="section-title">Smart Operations</h2>
+            <div class="landing-features">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-chair"></i></div>
+                    <h3>Interactive Floor Booking</h3>
+                    <p style="color: var(--text-muted); margin-top: 10px;">Select your exact seat visually with cinema-inspired seating map checking real-time date & time conflicts.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-pizza-slice"></i></div>
+                    <h3>Instant Order Pipeline</h3>
+                    <p style="color: var(--text-muted); margin-top: 10px;">Send dine-in or takeaway orders directly to the chef’s dashboard and track production steps on a live timeline.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-bell"></i></div>
+                    <h3>One-Click Call Assistance</h3>
+                    <p style="color: var(--text-muted); margin-top: 10px;">Dine-in customers can summon waiters, request water, or ask for the check directly from their device screens.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-box">
+            <h2>Ready to experience Maa Hata Randha?</h2>
+            <p>Sign in using our preloaded demo credentials to try all Admin, Staff, and Customer functionalities right away.</p>
+            <div class="cta-btns">
+                <a href="login.html" class="btn btn-primary">Try Customer Portal</a>
+                <a href="login.html" class="btn btn-outline" style="border-color: white; color: white;">Access Management Panel</a>
+            </div>
+        </section>
+    </main>
+
+    <footer style="text-align: center; padding: 40px 0; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 14px;">
+        <p>&copy; 2026 Maa Hata Randha. Design system powered by Antigravity IDE.</p>
+    </footer>
+
+    <!-- Init script -->
+    <script src="js/app.js"></script>
+</body>
+</html>

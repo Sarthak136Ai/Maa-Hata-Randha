@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Table | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .reserve-grid {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 24px;
+        }
+        @media (max-width: 992px) {
+            .reserve-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .my-bookings-section {
+            margin-top: 40px;
+        }
+        .table-shape-preview {
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .shape-round { border-radius: 50%; }
+        .shape-square { border-radius: 4px; }
+        .shape-rectangle { border-radius: 4px; width: 24px !important; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-gauge"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="menu.html" class="sidebar-link">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                        <span>Digital Menu</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="reservation.html" class="sidebar-link">
+                        <i class="fa-solid fa-chair"></i>
+                        <span>Book Table</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="cart.html" class="sidebar-link">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span>Active Cart</span>
+                        <span id="sidebar-cart-badge" class="badge badge-danger" style="margin-left: auto; display: none;">0</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Track Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="profile.html" class="sidebar-link">
+                        <i class="fa-solid fa-user-gear"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Book A Table</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Premium Guest</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="reserve-grid">
+                    <!-- Date and Options Form -->
+                    <div class="card flex flex-col" style="gap: 16px;">
+                        <h4 style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">Booking Wizard</h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="booking-date">1. Select Date</label>
+                            <input type="date" id="booking-date" class="form-control" onchange="onParametersChange()">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="booking-slot">2. Select Time Slot</label>
+                            <select id="booking-slot" class="form-control" onchange="onParametersChange()">
+                                <option value="12:00-14:00">12:00 PM - 02:00 PM</option>
+                                <option value="14:00-16:00">02:00 PM - 04:00 PM</option>
+                                <option value="16:00-18:00">04:00 PM - 06:00 PM</option>
+                                <option value="18:00-20:00" selected>06:00 PM - 08:00 PM</option>
+                                <option value="20:00-22:00">08:00 PM - 10:00 PM</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="booking-guests">3. Seating Capacity (Guests)</label>
+                            <select id="booking-guests" class="form-control" onchange="onParametersChange()">
+                                <option value="1">1 Guest</option>
+                                <option value="2" selected>2 Guests</option>
+                                <option value="3">3 Guests</option>
+                                <option value="4">4 Guests</option>
+                                <option value="5">5 Guests</option>
+                                <option value="6">6 Guests</option>
+                                <option value="8">8 Guests</option>
+                            </select>
+                        </div>
+
+                        <div id="selection-summary-card" style="background-color: #fafbfe; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; font-size: 13px; display: none;">
+                            <p style="font-weight: 600; margin-bottom: 4px; color: var(--secondary);">Selected Table:</p>
+                            <p id="summary-table-id" style="font-weight: 700; color: var(--primary); font-size: 16px;">T1</p>
+                            <p id="summary-table-details" style="color: var(--text-muted);">2 Seats, Main Dining Area</p>
+                        </div>
+
+                        <button id="book-now-btn" class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmBooking()" disabled>
+                            Confirm Reservation
+                        </button>
+                    </div>
+
+                    <!-- Visual Layout Selections -->
+                    <div class="floorplan-container">
+                        <h4 style="margin-bottom: 12px;">4. Choose Table Seating</h4>
+                        
+                        <div class="floorplan-legend">
+                            <div class="legend-item"><div class="legend-color available"></div><span>Available</span></div>
+                            <div class="legend-item"><div class="legend-color selected"></div><span>Selected</span></div>
+                            <div class="legend-item"><div class="legend-color reserved"></div><span>Reserved / Booked</span></div>
+                            <div class="legend-item"><div class="legend-color unavailable"></div><span>Maintenance</span></div>
+                            <div class="legend-item" style="opacity: 0.5;"><div class="legend-color" style="border: 2px dotted #ff4757; background: none;"></div><span>Too Small</span></div>
+                        </div>
+
+                        <div class="floorplan-sections" id="floorplan-sections-box">
+                            <!-- Dynamically loaded -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Booking Log -->
+                <div class="card my-bookings-section">
+                    <h4 style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px;">
+                        My Reservation History
+                    </h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Date</th>
+                                    <th>Time Slot</th>
+                                    <th>Guests</th>
+                                    <th>Table</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="my-reservations-rows">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Booking Confirmation Modal -->
+    <div class="modal" id="booking-confirm-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <i class="fa-solid fa-calendar-check" style="font-size: 48px; color: var(--success);"></i>
+                <h3 style="margin-top: 10px;">Booking Confirmed!</h3>
+            </div>
+            
+            <div style="background-color: #f8f9fa; border-radius: var(--radius-sm); padding: 16px; margin-bottom: 20px; font-size: 14px;">
+                <div class="flex justify-between" style="margin-bottom: 8px;"><strong>Reservation ID:</strong> <span id="modal-res-id" style="font-weight:700;">RES000</span></div>
+                <div class="flex justify-between" style="margin-bottom: 8px;"><strong>Guest Name:</strong> <span id="modal-cust-name">John Doe</span></div>
+                <div class="flex justify-between" style="margin-bottom: 8px;"><strong>Date:</strong> <span id="modal-date">2026-08-25</span></div>
+                <div class="flex justify-between" style="margin-bottom: 8px;"><strong>Time Slot:</strong> <span id="modal-slot">19:00-21:00</span></div>
+                <div class="flex justify-between" style="margin-bottom: 8px;"><strong>Guests Count:</strong> <span id="modal-guests">4</span></div>
+                <div class="flex justify-between" style="margin-bottom: 8px;"><strong>Reserved Table:</strong> <span id="modal-table">T4</span></div>
+                <div class="flex justify-between" style="margin-bottom: 8px;"><strong>Section:</strong> <span id="modal-section">Main Dining</span></div>
+                <div class="flex justify-between"><strong>Booking Status:</strong> <span class="badge badge-success">Confirmed</span></div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="closeModal()" style="width: 100%;">Close</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/reservation.js"></script>
+    <script>
+        const currentUser = checkAccess(['customer']);
+        let selectedTableId = "";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            // Set default date to today
+            const todayStr = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('booking-date');
+            dateInput.value = todayStr;
+            dateInput.min = todayStr;
+
+            renderTableLayout();
+            loadMyReservations();
+            updateCartBadge();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                renderTableLayout();
+                loadMyReservations();
+            });
+        });
+
+        function onParametersChange() {
+            selectedTableId = "";
+            document.getElementById('selection-summary-card').style.display = 'none';
+            document.getElementById('book-now-btn').setAttribute('disabled', 'true');
+            renderTableLayout();
+        }
+
+        function renderTableLayout() {
+            const date = document.getElementById('booking-date').value;
+            const slot = document.getElementById('booking-slot').value;
+            const guests = parseInt(document.getElementById('booking-guests').value);
+
+            if (!date || !slot) return;
+
+            const tables = dbGet('tables');
+            const reservedTables = getReservedTables(date, slot);
+
+            // Group tables by section
+            const sections = {};
+            tables.forEach(table => {
+                if (!sections[table.section]) {
+                    sections[table.section] = [];
+                }
+                sections[table.section].push(table);
+            });
+
+            const container = document.getElementById('floorplan-sections-box');
+            container.innerHTML = '';
+
+            for (const sectionName in sections) {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'floorplan-section';
+                sectionDiv.innerHTML = `<h5 class="floorplan-section-title">${sectionName}</h5>`;
+
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'tables-grid';
+
+                sections[sectionName].forEach(table => {
+                    const tableDiv = document.createElement('div');
+                    
+                    let shapeClass = 'shape-square';
+                    if (table.shape === 'round') shapeClass = 'shape-round';
+                    else if (table.shape === 'rectangle') shapeClass = 'shape-rectangle';
+
+                    // 1. Check Capacity Suitability
+                    const isSuitable = table.capacity >= guests;
+
+                    // 2. Check Booking Status
+                    const isBooked = reservedTables.includes(table.id);
+                    const isMaintenance = table.status !== 'Available';
+
+                    let statusClass = 'available';
+                    let clickHandler = `onclick="selectTable('${table.id}')"`;
+
+                    if (!isSuitable) {
+                        statusClass = 'unsuitable';
+                        clickHandler = '';
+                    } else if (isMaintenance) {
+                        statusClass = 'unavailable';
+                        clickHandler = '';
+                    } else if (isBooked) {
+                        statusClass = 'reserved';
+                        clickHandler = '';
+                    } else if (selectedTableId === table.id) {
+                        statusClass = 'selected';
+                    }
+
+                    tableDiv.className = `restaurant-table ${statusClass}`;
+                    tableDiv.setAttribute('id', `table-card-${table.id}`);
+                    if (clickHandler) {
+                        tableDiv.setAttribute('onclick', `selectTable('${table.id}', ${table.capacity}, '${table.section}')`);
+                    }
+
+                    tableDiv.innerHTML = `
+                        <span class="table-no">${table.number}</span>
+                        <span class="table-seats">${table.capacity} Seats</span>
+                        <div style="font-size:10px; margin-top:4px; opacity:0.7;">
+                            <i class="fa-solid fa-shapes"></i>
+                        </div>
+                    `;
+
+                    gridDiv.appendChild(tableDiv);
+                });
+
+                sectionDiv.appendChild(gridDiv);
+                container.appendChild(sectionDiv);
+            }
+        }
+
+        function selectTable(tableId, capacity, section) {
+            if (selectedTableId) {
+                const oldCard = document.getElementById(`table-card-${selectedTableId}`);
+                if (oldCard) oldCard.classList.remove('selected');
+            }
+
+            selectedTableId = tableId;
+            const newCard = document.getElementById(`table-card-${tableId}`);
+            if (newCard) newCard.classList.add('selected');
+
+            document.getElementById('summary-table-id').innerText = `Table ${tableId}`;
+            document.getElementById('summary-table-details').innerText = `${capacity} Seats, ${section}`;
+            document.getElementById('selection-summary-card').style.display = 'block';
+            document.getElementById('book-now-btn').removeAttribute('disabled');
+        }
+
+        function confirmBooking() {
+            const date = document.getElementById('booking-date').value;
+            const slot = document.getElementById('booking-slot').value;
+            const guests = document.getElementById('booking-guests').value;
+
+            if (!date || !slot || !guests || !selectedTableId) {
+                showToast("Please fill all booking options and choose a table.", "warning");
+                return;
+            }
+
+            const res = submitNewReservation(currentUser.id, currentUser.name, {
+                tableId: selectedTableId,
+                date: date,
+                timeSlot: slot,
+                guests: guests
+            });
+
+            if (!res.success) {
+                showToast(res.message, "error");
+                onParametersChange();
+                return;
+            }
+
+            const tables = dbGet('tables');
+            const tblObj = tables.find(t => t.id === selectedTableId);
+
+            document.getElementById('modal-res-id').innerText = res.reservation.reservationId;
+            document.getElementById('modal-cust-name').innerText = currentUser.name;
+            document.getElementById('modal-date').innerText = date;
+            document.getElementById('modal-slot').innerText = slot;
+            document.getElementById('modal-guests').innerText = guests;
+            document.getElementById('modal-table').innerText = tblObj ? tblObj.number : selectedTableId;
+            document.getElementById('modal-section').innerText = tblObj ? tblObj.section : "";
+
+            document.getElementById('booking-confirm-modal').classList.add('active');
+
+            selectedTableId = "";
+            document.getElementById('selection-summary-card').style.display = 'none';
+            document.getElementById('book-now-btn').setAttribute('disabled', 'true');
+
+            renderTableLayout();
+            loadMyReservations();
+        }
+
+        function loadMyReservations() {
+            const reservations = dbGet('reservations');
+            const myRes = reservations.filter(res => res.customerId === currentUser.id);
+            const tbody = document.getElementById('my-reservations-rows');
+            
+            tbody.innerHTML = '';
+            
+            if (myRes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: var(--text-muted);">
+                            You have no historical reservations.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            [...myRes].reverse().forEach(res => {
+                let badgeClass = 'badge-success';
+                if (res.status === 'Cancelled') badgeClass = 'badge-danger';
+                else if (res.status === 'Completed') badgeClass = 'badge-info';
+
+                let actionBtn = '';
+                if (res.status === 'Confirmed') {
+                    actionBtn = `
+                        <button class="btn btn-sm btn-danger" onclick="cancelBooking('${res.reservationId}')">
+                            Cancel
+                        </button>
+                    `;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${res.reservationId}</strong></td>
+                        <td>${res.date}</td>
+                        <td>${res.timeSlot}</td>
+                        <td>${res.guests} Guests</td>
+                        <td>Table ${res.tableId}</td>
+                        <td><span class="badge ${badgeClass}">${res.status}</span></td>
+                        <td>${actionBtn}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function cancelBooking(id) {
+            if (!confirm("Are you sure you want to cancel this table booking?")) {
+                return;
+            }
+
+            const reservations = dbGet('reservations');
+            const res = reservations.find(r => r.reservationId === id);
+            
+            if (res) {
+                res.status = 'Cancelled';
+                dbSet('reservations', reservations);
+                showToast("Reservation cancelled successfully.", "info");
+                loadMyReservations();
+                renderTableLayout();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('booking-confirm-modal').classList.remove('active');
+        }
+
+        function updateCartBadge() {
+            const cart = JSON.parse(localStorage.getItem('cart_' + currentUser.id)) || [];
+            const badge = document.getElementById('sidebar-cart-badge');
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            if (totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

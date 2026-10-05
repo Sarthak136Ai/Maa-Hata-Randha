@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Layout Management | Maa Hata Randha</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .layout-editor-canvas {
+            position: relative;
+            background-color: #fafbfe;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            height: 480px;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .canvas-table {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: move;
+            user-select: none;
+            box-shadow: var(--shadow-md);
+            transition: border-color 0.2s;
+            border: 2px solid transparent;
+        }
+        .canvas-table.round { border-radius: 50%; }
+        .canvas-table.square { border-radius: 6px; }
+        .canvas-table.rectangle { width: 100px; height: 60px; border-radius: 6px; }
+        
+        .canvas-table.available { background-color: #2ed573; }
+        .canvas-table.unavailable { background-color: #a4b0be; }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr;
+            gap: 24px;
+        }
+        @media (max-width: 992px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <i class="fa-solid fa-utensils"></i>
+                    Maa Hata<span>Randha</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="dashboard.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="menu-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-bowl-food"></i>
+                        <span>Menu Items</span>
+                    </a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="table-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-map"></i>
+                        <span>Tables & Layout</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="orders.html" class="sidebar-link">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Orders Master</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="staff-management.html" class="sidebar-link">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Staff Directory</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="customers.html" class="sidebar-link">
+                        <i class="fa-solid fa-address-book"></i>
+                        <span>Customer Registry</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="analytics.html" class="sidebar-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Analytics Insights</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-navbar">
+                <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h3>Dining Layout Designer</h3>
+                <div class="user-profile">
+                    <div class="user-avatar" id="avatar-circle">A</div>
+                    <div class="user-info">
+                        <div class="user-name" id="navbar-username">Loading...</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="editor-container">
+                    <!-- Layout Drag Canvas Panel -->
+                    <div class="flex-col">
+                        <div class="flex justify-between align-center" style="margin-bottom:12px;">
+                            <h4 style="margin-bottom: 0;">Drag & Drop Seating Canvas</h4>
+                            <div class="flex" style="gap:10px;">
+                                <button class="btn btn-secondary btn-sm" onclick="saveVisualLayout()">
+                                    <i class="fa-solid fa-floppy-disk"></i> Save Floor Layout
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="openAddTableModal()">
+                                    <i class="fa-solid fa-plus"></i> Add Table
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="layout-editor-canvas" id="canvas-container">
+                            <!-- Visual Tables rendered here -->
+                        </div>
+                        <p style="font-size:12px; color:var(--text-muted); margin-top:-16px; margin-bottom: 24px;">
+                            <i class="fa-solid fa-circle-info"></i> Drag tables around the canvas to position them. Click "Save Floor Layout" when complete.
+                        </p>
+                    </div>
+
+                    <!-- Database CRUD table list -->
+                    <div class="card flex flex-col" style="padding:20px; overflow-y:auto; max-height: 560px;">
+                        <h4 style="border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
+                            Registered Tables
+                        </h4>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Capacity</th>
+                                        <th>Section</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tables-registry-rows">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Table Modal -->
+    <div class="modal" id="table-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeTableModal()">&times;</button>
+            <h3 id="table-modal-title" style="margin-bottom: 20px;">Add New Table</h3>
+            
+            <form id="table-form" onsubmit="handleTableSubmit(event)">
+                <input type="hidden" id="table-id-field">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="table-num">Table Number</label>
+                        <input type="text" id="table-num" class="form-control" placeholder="T11" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="table-cap">Capacity (Seats)</label>
+                        <input type="number" id="table-cap" class="form-control" min="1" max="20" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="table-section">Floor Section</label>
+                        <select id="table-section" class="form-control" required>
+                            <option value="Window Area">Window Area</option>
+                            <option value="Main Dining Area">Main Dining Area</option>
+                            <option value="Outdoor Seating">Outdoor Seating</option>
+                            <option value="VIP Section">VIP Section</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="table-shape">Table Shape</label>
+                        <select id="table-shape" class="form-control" required>
+                            <option value="square">Square</option>
+                            <option value="round">Round</option>
+                            <option value="rectangle">Rectangular</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="table-status">Base Status</label>
+                    <select id="table-status" class="form-control" required>
+                        <option value="Available">Available (Open)</option>
+                        <option value="Maintenance">Maintenance (Closed)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding:12px; margin-top:10px;">
+                    Save Table Config
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        const currentUser = checkAccess(['admin']);
+        let dragItem = null;
+        let activeX = 0;
+        let activeY = 0;
+        let initialX = 0;
+        let initialY = 0;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) return;
+            document.getElementById('navbar-username').innerText = currentUser.name;
+            document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            loadLayoutEditor();
+        });
+
+        function loadLayoutEditor() {
+            loadCanvasTables();
+            loadTablesTable();
+        }
+
+        function loadCanvasTables() {
+            const tables = JSON.parse(localStorage.getItem('tables')) || [];
+            const canvas = document.getElementById('canvas-container');
+            canvas.innerHTML = '';
+
+            tables.forEach(table => {
+                const el = document.createElement('div');
+                el.className = `canvas-table ${table.shape} ${table.status.toLowerCase()}`;
+                el.setAttribute('id', `drag-table-${table.id}`);
+                el.setAttribute('data-id', table.id);
+                
+                // Position absolutely
+                el.style.left = `${table.x}px`;
+                el.style.top = `${table.y}px`;
+
+                el.innerHTML = `
+                    <strong>${table.number}</strong>
+                    <span style="font-size:10px;">${table.capacity} Pax</span>
+                `;
+
+                // Add drag events
+                el.addEventListener('mousedown', dragStart);
+                el.addEventListener('touchstart', dragStart, { passive: false });
+
+                canvas.appendChild(el);
+            });
+        }
+
+        function loadTablesTable() {
+            const tables = JSON.parse(localStorage.getItem('tables')) || [];
+            const tbody = document.getElementById('tables-registry-rows');
+            tbody.innerHTML = '';
+
+            tables.forEach(t => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${t.number}</strong></td>
+                        <td>${t.capacity} Seats</td>
+                        <td>${t.section}</td>
+                        <td>
+                            <div class="flex" style="gap:4px;">
+                                <button class="btn btn-sm btn-outline" style="padding:4px 8px;" onclick="openEditTableModal('${t.id}')">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" style="padding:4px 8px; background-color:var(--danger); color:white;" onclick="deleteTableAlert('${t.id}', '${t.number}')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Visual Drag & Drop Engine (Vanilla JS absolute position manipulation)
+        function dragStart(e) {
+            dragItem = e.target.closest('.canvas-table');
+            if (!dragItem) return;
+
+            const clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+
+            // Get initial styles
+            initialX = parseFloat(dragItem.style.left) || 0;
+            initialY = parseFloat(dragItem.style.top) || 0;
+            
+            xOffset = clientX - initialX;
+            yOffset = clientY - initialY;
+
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('touchend', dragEnd);
+        }
+
+        function drag(e) {
+            if (!dragItem) return;
+            e.preventDefault();
+
+            const clientX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === "touchmove" ? e.touches[0].clientY : e.clientY;
+
+            activeX = clientX - xOffset;
+            activeY = clientY - yOffset;
+
+            // Boundary constraints for canvas container (480px height, ~100% width)
+            const canvas = document.getElementById('canvas-container');
+            const maxW = canvas.clientWidth - dragItem.clientWidth;
+            const maxH = canvas.clientHeight - dragItem.clientHeight;
+
+            activeX = Math.max(0, Math.min(activeX, maxW));
+            activeY = Math.max(0, Math.min(activeY, maxH));
+
+            dragItem.style.left = `${activeX}px`;
+            dragItem.style.top = `${activeY}px`;
+        }
+
+        function dragEnd() {
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', dragEnd);
+            dragItem = null;
+        }
+
+        function saveVisualLayout() {
+            const canvasItems = document.querySelectorAll('.canvas-table');
+            const tables = JSON.parse(localStorage.getItem('tables')) || [];
+
+            canvasItems.forEach(item => {
+                const id = item.getAttribute('data-id');
+                const x = Math.round(parseFloat(item.style.left) || 0);
+                const y = Math.round(parseFloat(item.style.top) || 0);
+
+                const table = tables.find(t => t.id === id);
+                if (table) {
+                    table.x = x;
+                    table.y = y;
+                }
+            });
+
+            localStorage.setItem('tables', JSON.stringify(tables));
+            showToast("Visual table layout saved successfully!", "success");
+        }
+
+        function openAddTableModal() {
+            document.getElementById('table-form').reset();
+            document.getElementById('table-id-field').value = '';
+            document.getElementById('table-modal-title').innerText = "Add New Table";
+            document.getElementById('table-modal').classList.add('active');
+        }
+
+        function openEditTableModal(id) {
+            const tables = JSON.parse(localStorage.getItem('tables')) || [];
+            const t = tables.find(tbl => tbl.id === id);
+            if (!t) return;
+
+            document.getElementById('table-id-field').value = t.id;
+            document.getElementById('table-num').value = t.number;
+            document.getElementById('table-cap').value = t.capacity;
+            document.getElementById('table-section').value = t.section;
+            document.getElementById('table-shape').value = t.shape;
+            document.getElementById('table-status').value = t.status;
+
+            document.getElementById('table-modal-title').innerText = "Edit Table Details";
+            document.getElementById('table-modal').classList.add('active');
+        }
+
+        function closeTableModal() {
+            document.getElementById('table-modal').classList.remove('active');
+        }
+
+        function handleTableSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('table-id-field').value;
+            const number = document.getElementById('table-num').value.trim();
+            const capacity = document.getElementById('table-cap').value;
+            const section = document.getElementById('table-section').value;
+            const shape = document.getElementById('table-shape').value;
+            const status = document.getElementById('table-status').value;
+
+            const tableData = {
+                number,
+                capacity,
+                section,
+                shape,
+                status
+            };
+
+            let res;
+            if (id) {
+                res = adminEditTable(id, tableData);
+                if (res.success) showToast("Table configuration updated!", "success");
+            } else {
+                res = adminAddTable(tableData);
+                if (res.success) showToast("Table added successfully!", "success");
+            }
+
+            if (res && res.success) {
+                closeTableModal();
+                loadLayoutEditor();
+            } else {
+                showToast(res.message || "Failed to save table.", "error");
+            }
+        }
+
+        function deleteTableAlert(id, num) {
+            if (confirm(`Are you sure you want to delete Table ${num}? This could affect active reservations.`)) {
+                const res = adminDeleteTable(id);
+                if (res.success) {
+                    showToast(`Table ${num} deleted.`, "info");
+                    loadLayoutEditor();
+                } else {
+                    showToast(res.message, "error");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
