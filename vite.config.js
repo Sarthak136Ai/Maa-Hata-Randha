@@ -1,9 +1,30 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import fs from 'fs';
+
+function copyStaticAssets() {
+  return {
+    name: 'copy-static-assets',
+    closeBundle() {
+      const distDir = resolve(import.meta.dirname, 'dist');
+      ['css', 'js'].forEach((dir) => {
+        const src = resolve(import.meta.dirname, dir);
+        const dest = resolve(distDir, dir);
+        if (fs.existsSync(src)) {
+          fs.cpSync(src, dest, { recursive: true });
+        }
+      });
+      const dataSrc = resolve(import.meta.dirname, 'data.json');
+      if (fs.existsSync(dataSrc)) {
+        fs.copyFileSync(dataSrc, resolve(distDir, 'data.json'));
+      }
+    },
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), copyStaticAssets()],
   server: {
     port: 5173,
     open: true,
