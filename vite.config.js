@@ -8,7 +8,7 @@ function copyStaticAssets() {
     name: 'copy-static-assets',
     closeBundle() {
       const distDir = resolve(import.meta.dirname, 'dist');
-      ['css', 'js'].forEach((dir) => {
+      ['css', 'js', 'images'].forEach((dir) => {
         const src = resolve(import.meta.dirname, dir);
         const dest = resolve(distDir, dir);
         if (fs.existsSync(src)) {

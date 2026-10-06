@@ -221,10 +221,15 @@
             document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
 
             loadMenuItemsTable();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                loadMenuItemsTable();
+            });
         });
 
         function loadMenuItemsTable() {
-            const menu = JSON.parse(localStorage.getItem('menuItems')) || [];
+            const menu = dbGet('menuItems');
             const tbody = document.getElementById('menu-items-table-rows');
             tbody.innerHTML = '';
 

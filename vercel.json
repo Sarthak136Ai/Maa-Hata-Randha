@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/api/data",
+      "dest": "/api/data.js",
+      "headers": {
+        "cache-control": "no-store, no-cache, must-revalidate, max-age=0",
+        "access-control-allow-origin": "*"
+      }
+    },
+    {
+      "src": "/api/reset",
+      "dest": "/api/reset.js",
+      "headers": {
+        "cache-control": "no-store, no-cache, must-revalidate, max-age=0",
+        "access-control-allow-origin": "*"
+      }
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1.js"
+    },
+    {
+      "handle": "filesystem"
+    }
+  ]
+}

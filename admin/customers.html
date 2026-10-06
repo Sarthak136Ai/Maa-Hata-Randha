@@ -129,12 +129,17 @@
             document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
 
             loadCustomers();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                loadCustomers();
+            });
         });
 
         function loadCustomers() {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const orders = JSON.parse(localStorage.getItem('orders')) || [];
-            const reservations = JSON.parse(localStorage.getItem('reservations')) || [];
+            const users = dbGet('users');
+            const orders = dbGet('orders');
+            const reservations = dbGet('reservations');
 
             const tbody = document.getElementById('customers-table-rows');
             tbody.innerHTML = '';

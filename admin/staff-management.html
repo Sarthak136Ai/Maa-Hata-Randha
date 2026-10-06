@@ -176,10 +176,15 @@
             document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
 
             loadStaffTable();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                loadStaffTable();
+            });
         });
 
         function loadStaffTable() {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const users = dbGet('users');
             const tbody = document.getElementById('staff-table-rows');
             tbody.innerHTML = '';
 

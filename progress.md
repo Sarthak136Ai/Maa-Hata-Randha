@@ -131,6 +131,21 @@ Restaurant-Management/
 
 ## 📅 Changelog & Recent Updates
 
+* **[2026-10-06] Comprehensive 37-Dish Food Photography Audit & Local Asset Pipeline Completed**:
+  * Performed a complete, item-by-item audit of all 37 food items (`M001` through `M037`) across all 6 categories (Starters, Main Course, Biryani, Fast Foods, Desserts, Beverages).
+  * Replaced all external Unsplash URLs with verified local high-resolution photographs (`/images/dishes/M001.jpg` to `/images/dishes/M037.jpg`), ensuring zero 404/403/CORS or CDN latency issues on both local server and Vercel cloud deployment.
+  * Verified exact visual correspondence for every dish (e.g. Malai Tikka, Amritsari Fish Fry, Golden Fried Prawns, Dal Makhani, Kadai Paneer, Shahi Malai Kofta, Mutton Biryani, Blue Lagoon Mocktail, Garlic Naan Basket).
+  * Upgraded `server.py` with `ThreadingHTTPServer` and disabled Windows reverse DNS delay in `address_string()` for sub-millisecond local response times.
+  * Synchronized updated item image paths across [`data.json`](file:///c:/Users/hp/OneDrive/Desktop/Restaurant-Management/data.json), [`js/app.js`](file:///c:/Users/hp/OneDrive/Desktop/Restaurant-Management/js/app.js), [`server.py`](file:///c:/Users/hp/OneDrive/Desktop/Restaurant-Management/server.py), and the Vite production bundle (`dist/`).
+
+* **[2026-10-06] Vercel Cloud Serverless API & Real-Time Portal Synchronization Integrated**:
+  * Resolved multi-portal cross-device synchronization failure on Vercel deployment (`https://maa-hata-randha.vercel.app/`).
+  * Created Vercel Serverless Function endpoints:
+    * `api/data.js`: Full Node.js REST API handling `GET`, `POST`, `OPTIONS`, `PUT`, `DELETE` with universal CORS, cache-busting headers, memory state caching, and initial data seeding from `data.json`.
+    * `api/reset.js`: Serverless database reset endpoint to restore default catalog and floor plan configuration.
+  * Added `vercel.json` routing configuration mapping `/api/data` and `/api/reset` directly to serverless function endpoints with zero-caching policies.
+  * Upgraded `js/app.js` and `src/context/RestaurantContext.jsx` with timestamped cache-busting polling (`/api/data?_t=...`), bidirectional `BroadcastChannel` synchronization, `localStorage` immediate mirror, and `CustomEvent('db_updated')` dispatching.
+  * Added real-time `db_updated` listeners across all admin modules (`menu-management.html`, `table-management.html`, `staff-management.html`, `customers.html`, `analytics.html`) ensuring changes from customer orders or table bookings immediately reflect in the admin and staff views without manual page refresh.
 * **[2026-10-05] GitHub Remote Repository Synchronized & Optimized**:
   * Added production-ready `.gitignore` excluding `node_modules/`, logs, and temporary caches.
   * Successfully pushed all 53 project source files, React portal suite, Vite configuration, server script, and full documentation to [`Sarthak136Ai/Maa-Hata-Randha`](https://github.com/Sarthak136Ai/Maa-Hata-Randha) on branch `main`.

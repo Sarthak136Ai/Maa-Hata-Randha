@@ -260,6 +260,11 @@
             document.getElementById('avatar-circle').innerText = currentUser.name.charAt(0).toUpperCase();
 
             loadLayoutEditor();
+
+            // Real-time synchronization
+            window.addEventListener('db_updated', () => {
+                loadLayoutEditor();
+            });
         });
 
         function loadLayoutEditor() {

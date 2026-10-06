@@ -65,7 +65,9 @@ export const RestaurantProvider = ({ children }) => {
       }
 
       // 2. Fetch fresh backend state
-      const res = await fetch('/api/data');
+      const res = await fetch('/api/data?_t=' + Date.now(), {
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
       if (res.ok) {
         const data = await res.json();
         setDb(data);
@@ -91,14 +93,16 @@ export const RestaurantProvider = ({ children }) => {
       return next;
     });
 
-    // 2. Broadcast Channel update
+    // 2. Broadcast Channel & Local custom event
     try {
       if (window.BroadcastChannel) {
         const bc = new BroadcastChannel('restaurant_global_sync');
-        bc.postMessage({ type: 'sync_update', key, value });
+        bc.postMessage({ key, value, timestamp: Date.now() });
         bc.close();
       }
     } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent('db_updated', { detail: { key, value } }));
 
     // 3. Server persistence
     try {
@@ -148,11 +152,25 @@ export const RestaurantProvider = ({ children }) => {
       };
     } catch (e) {}
 
-    // Polling interval
-    const interval = setInterval(loadData, 4000);
+    const handleStorage = (e) => {
+      if (['users', 'tables', 'menuItems', 'reservations', 'orders', 'serviceRequests'].includes(e.key)) {
+        loadData();
+      }
+    };
+    const handleDbUpdated = () => {
+      loadData();
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('db_updated', handleDbUpdated);
+
+    // Polling interval for cross-browser sync
+    const interval = setInterval(loadData, 2000);
 
     return () => {
       if (bc) bc.close();
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('db_updated', handleDbUpdated);
       clearInterval(interval);
     };
   }, [loadData]);
