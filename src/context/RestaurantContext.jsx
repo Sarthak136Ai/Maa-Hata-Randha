@@ -42,25 +42,91 @@ export const RestaurantProvider = ({ children }) => {
     }, 3500);
   };
 
-  // Fetch from server / local storage
+const ENTITY_STATUS_RANK = {
+  'placed': 1,
+  'accepted': 2,
+  'preparing': 3,
+  'ready': 4,
+  'served': 5,
+  'completed': 6,
+  'cancelled': 7,
+  'pending': 1,
+  'confirmed': 2,
+  'seated': 3,
+  'in progress': 2,
+  'resolved': 3
+};
+
+function getEntityStatusRank(status) {
+  if (!status) return 0;
+  return ENTITY_STATUS_RANK[String(status).trim().toLowerCase()] || 0;
+}
+
+function mergeEntityArrays(key, localItems, serverItems) {
+  if (!Array.isArray(localItems)) localItems = [];
+  if (!Array.isArray(serverItems)) serverItems = [];
+
+  let idKey = 'id';
+  if (key === 'orders') idKey = 'orderId';
+  else if (key === 'reservations') idKey = 'reservationId';
+  else if (key === 'serviceRequests') idKey = 'requestId';
+
+  const map = new Map();
+  for (const item of serverItems) {
+    if (!item || typeof item !== 'object') continue;
+    const id = item[idKey] || item.id || (item.email ? item.email : null);
+    if (id) map.set(String(id), { ...item });
+  }
+
+  for (const item of localItems) {
+    if (!item || typeof item !== 'object') continue;
+    const id = item[idKey] || item.id || (item.email ? item.email : null);
+    if (!id) continue;
+    const idStr = String(id);
+
+    if (!map.has(idStr)) {
+      map.set(idStr, { ...item });
+    } else {
+      const existing = map.get(idStr);
+      const localRank = getEntityStatusRank(item.status);
+      const serverRank = getEntityStatusRank(existing.status);
+
+      let chosen = existing;
+      if (localRank > serverRank) {
+        chosen = { ...existing, ...item };
+      } else if (localRank === serverRank) {
+        const localTime = new Date(item.updatedAt || item.createdAt || 0).getTime();
+        const serverTime = new Date(existing.updatedAt || existing.createdAt || 0).getTime();
+        if (localTime >= serverTime) {
+          chosen = { ...existing, ...item };
+        }
+      }
+      map.set(idStr, chosen);
+    }
+  }
+
+  return Array.from(map.values());
+}
+
+  // Fetch from server / local storage with progressive merge
   const loadData = useCallback(async () => {
     try {
       // 1. Try local storage cache
-      const localUsers = localStorage.getItem('users');
-      const localMenu = localStorage.getItem('menuItems');
-      const localTables = localStorage.getItem('tables');
-      const localOrders = localStorage.getItem('orders');
-      const localRes = localStorage.getItem('reservations');
-      const localReq = localStorage.getItem('serviceRequests');
+      const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
+      const localMenu = JSON.parse(localStorage.getItem('menuItems') || '[]');
+      const localTables = JSON.parse(localStorage.getItem('tables') || '[]');
+      const localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+      const localRes = JSON.parse(localStorage.getItem('reservations') || '[]');
+      const localReq = JSON.parse(localStorage.getItem('serviceRequests') || '[]');
 
-      if (localMenu && localUsers) {
+      if (localMenu.length > 0 && localUsers.length > 0) {
         setDb({
-          users: JSON.parse(localUsers || '[]'),
-          menuItems: JSON.parse(localMenu || '[]'),
-          tables: JSON.parse(localTables || '[]'),
-          orders: JSON.parse(localOrders || '[]'),
-          reservations: JSON.parse(localRes || '[]'),
-          serviceRequests: JSON.parse(localReq || '[]')
+          users: localUsers,
+          menuItems: localMenu,
+          tables: localTables,
+          orders: localOrders,
+          reservations: localRes,
+          serviceRequests: localReq
         });
       }
 
@@ -69,15 +135,33 @@ export const RestaurantProvider = ({ children }) => {
         headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
       });
       if (res.ok) {
-        const data = await res.json();
-        setDb(data);
-        // sync to local storage
-        Object.keys(data).forEach(key => {
-          if (Array.isArray(data[key])) {
-            localStorage.setItem(key, JSON.stringify(data[key]));
+        const serverData = await res.json();
+        const mergedDb = {};
+        const pendingServerSync = {};
+        const keys = ['users', 'tables', 'menuItems', 'reservations', 'orders', 'serviceRequests'];
+
+        keys.forEach(k => {
+          const localArr = JSON.parse(localStorage.getItem(k) || '[]');
+          const serverArr = Array.isArray(serverData[k]) ? serverData[k] : [];
+          const mergedArr = mergeEntityArrays(k, localArr, serverArr);
+          mergedDb[k] = mergedArr;
+          localStorage.setItem(k, JSON.stringify(mergedArr));
+
+          if (JSON.stringify(serverArr) !== JSON.stringify(mergedArr)) {
+            pendingServerSync[k] = mergedArr;
           }
         });
+
+        setDb(prev => ({ ...prev, ...mergedDb }));
         setSyncStatus('synced');
+
+        if (Object.keys(pendingServerSync).length > 0) {
+          fetch('/api/data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(pendingServerSync)
+          }).catch(() => {});
+        }
       }
     } catch (err) {
       console.warn('Backend offline or using local state:', err);

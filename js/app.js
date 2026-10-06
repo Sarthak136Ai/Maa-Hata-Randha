@@ -1,13 +1,91 @@
 // Shared Restaurant Management Application Logic & Cross-Browser Synchronization
 
+// Status lifecycle weights for monotonic non-regressive merging (prevents multi-instance serverless oscillations)
+const ENTITY_STATUS_RANK = {
+    // Orders
+    'placed': 1,
+    'accepted': 2,
+    'preparing': 3,
+    'ready': 4,
+    'served': 5,
+    'completed': 6,
+    'cancelled': 7,
+    // Reservations
+    'pending': 1,
+    'confirmed': 2,
+    'seated': 3,
+    // Assistance Requests
+    'in progress': 2,
+    'resolved': 3
+};
+
+function getEntityStatusRank(status) {
+    if (!status) return 0;
+    return ENTITY_STATUS_RANK[String(status).trim().toLowerCase()] || 0;
+}
+
+// Progressive Entity Merger: keeps newest items and higher lifecycle states without data regression
+function mergeEntityArrays(key, localItems, serverItems) {
+    if (!Array.isArray(localItems)) localItems = [];
+    if (!Array.isArray(serverItems)) serverItems = [];
+
+    let idKey = 'id';
+    if (key === 'orders') idKey = 'orderId';
+    else if (key === 'reservations') idKey = 'reservationId';
+    else if (key === 'serviceRequests') idKey = 'requestId';
+
+    const mergedMap = new Map();
+
+    // 1. Load server items
+    for (const item of serverItems) {
+        if (!item || typeof item !== 'object') continue;
+        const id = item[idKey] || item.id || (item.email ? item.email : null);
+        if (id) {
+            mergedMap.set(String(id), { ...item });
+        }
+    }
+
+    // 2. Merge local items (never let an older serverless instance drop a local order/reservation)
+    for (const item of localItems) {
+        if (!item || typeof item !== 'object') continue;
+        const id = item[idKey] || item.id || (item.email ? item.email : null);
+        if (!id) continue;
+        const idStr = String(id);
+
+        if (!mergedMap.has(idStr)) {
+            mergedMap.set(idStr, { ...item });
+        } else {
+            const existing = mergedMap.get(idStr);
+            const localRank = getEntityStatusRank(item.status);
+            const serverRank = getEntityStatusRank(existing.status);
+
+            let chosen = existing;
+            if (localRank > serverRank) {
+                chosen = { ...existing, ...item };
+            } else if (localRank === serverRank) {
+                const localTime = new Date(item.updatedAt || item.createdAt || 0).getTime();
+                const serverTime = new Date(existing.updatedAt || existing.createdAt || 0).getTime();
+                if (localTime >= serverTime) {
+                    chosen = { ...existing, ...item };
+                }
+            }
+            mergedMap.set(idStr, chosen);
+        }
+    }
+
+    return Array.from(mergedMap.values());
+}
+
 // Global broadcast channel for instant multi-tab sync in the same browser
 const syncChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('restaurant_global_sync') : null;
 
 if (syncChannel) {
     syncChannel.onmessage = (event) => {
-        if (event.data && event.data.key) {
+        if (event.data && event.data.key && event.data.value) {
             try {
-                localStorage.setItem(event.data.key, JSON.stringify(event.data.value));
+                const current = dbGet(event.data.key);
+                const merged = mergeEntityArrays(event.data.key, current, event.data.value);
+                localStorage.setItem(event.data.key, JSON.stringify(merged));
             } catch (e) {}
             window.dispatchEvent(new CustomEvent('db_updated', { detail: event.data }));
         }
@@ -60,21 +138,43 @@ async function syncFromServer() {
         if (!res.ok) return;
         const serverDb = await res.json();
         
-        let hasChanges = false;
+        let hasLocalChanges = false;
+        let pendingServerSync = {};
         const keys = ['users', 'tables', 'menuItems', 'reservations', 'orders', 'serviceRequests'];
 
         for (const k of keys) {
             if (serverDb[k] !== undefined) {
-                const localStr = localStorage.getItem(k);
-                const serverStr = JSON.stringify(serverDb[k]);
-                if (localStr !== serverStr) {
-                    localStorage.setItem(k, serverStr);
-                    hasChanges = true;
+                const localArr = dbGet(k);
+                const serverArr = serverDb[k];
+                const mergedArr = mergeEntityArrays(k, localArr, serverArr);
+
+                const localStr = JSON.stringify(localArr);
+                const serverStr = JSON.stringify(serverArr);
+                const mergedStr = JSON.stringify(mergedArr);
+
+                // Update local storage only if merged data brings new server records
+                if (localStr !== mergedStr) {
+                    localStorage.setItem(k, mergedStr);
+                    hasLocalChanges = true;
+                }
+
+                // If serverless lambda instance had stale data, warm it with merged state
+                if (serverStr !== mergedStr) {
+                    pendingServerSync[k] = mergedArr;
                 }
             }
         }
 
-        if (hasChanges) {
+        // Send merged state to server if server was behind
+        if (Object.keys(pendingServerSync).length > 0) {
+            fetch('/api/data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(pendingServerSync)
+            }).catch(() => {});
+        }
+
+        if (hasLocalChanges) {
             localStorage.setItem('rest_db_initialized', 'true');
             window.dispatchEvent(new CustomEvent('db_updated', { detail: { full: true } }));
         }

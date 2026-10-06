@@ -131,6 +131,12 @@ Restaurant-Management/
 
 ## 📅 Changelog & Recent Updates
 
+* **[2026-10-06] Zero-Flicker Monotonic Entity Merger & Vercel Multi-Instance Consistency Fix**:
+  * Resolved data flickering / oscillation on Admin Dashboard (`Today's Revenue`, `Active Reservations`, and recent transactions) caused by stateless Vercel Serverless Function instances returning disparate cache snapshots.
+  * Implemented Progressive Entity Merger (`mergeEntityArrays`) in `js/app.js`, `api/data.js`, and `src/context/RestaurantContext.jsx` with lifecycle status weighting (`Placed` < `Accepted` < `Preparing` < `Ready` < `Served` < `Completed`).
+  * Enforced union-by-ID preservation so older serverless lambda instances never overwrite or delete newly created customer orders or table reservations.
+  * Added bidirectional warming sync: when a client detects a serverless instance is missing recent entries, it automatically syncs the merged state back to `/api/data` in the background.
+
 * **[2026-10-06] Comprehensive 37-Dish Food Photography Audit & Local Asset Pipeline Completed**:
   * Performed a complete, item-by-item audit of all 37 food items (`M001` through `M037`) across all 6 categories (Starters, Main Course, Biryani, Fast Foods, Desserts, Beverages).
   * Replaced all external Unsplash URLs with verified local high-resolution photographs (`/images/dishes/M001.jpg` to `/images/dishes/M037.jpg`), ensuring zero 404/403/CORS or CDN latency issues on both local server and Vercel cloud deployment.

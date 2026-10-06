@@ -6,6 +6,76 @@ let memoryDb = null;
 let dbVersion = 1;
 let lastUpdatedAt = Date.now();
 
+// Entity status progression weight map for non-regressive merging
+const ENTITY_STATUS_RANK = {
+  'placed': 1,
+  'accepted': 2,
+  'preparing': 3,
+  'ready': 4,
+  'served': 5,
+  'completed': 6,
+  'cancelled': 7,
+  'pending': 1,
+  'confirmed': 2,
+  'seated': 3,
+  'in progress': 2,
+  'resolved': 3
+};
+
+function getEntityStatusRank(status) {
+  if (!status) return 0;
+  return ENTITY_STATUS_RANK[String(status).trim().toLowerCase()] || 0;
+}
+
+function mergeEntityArrays(key, existingItems, incomingItems) {
+  if (!Array.isArray(existingItems)) existingItems = [];
+  if (!Array.isArray(incomingItems)) incomingItems = [];
+
+  let idKey = 'id';
+  if (key === 'orders') idKey = 'orderId';
+  else if (key === 'reservations') idKey = 'reservationId';
+  else if (key === 'serviceRequests') idKey = 'requestId';
+
+  const map = new Map();
+
+  // 1. Seed existing items
+  for (const item of existingItems) {
+    if (!item || typeof item !== 'object') continue;
+    const id = item[idKey] || item.id || (item.email ? item.email : null);
+    if (id) map.set(String(id), { ...item });
+  }
+
+  // 2. Merge incoming items with status progression & timestamp resolution
+  for (const item of incomingItems) {
+    if (!item || typeof item !== 'object') continue;
+    const id = item[idKey] || item.id || (item.email ? item.email : null);
+    if (!id) continue;
+    const idStr = String(id);
+
+    if (!map.has(idStr)) {
+      map.set(idStr, { ...item });
+    } else {
+      const existing = map.get(idStr);
+      const incRank = getEntityStatusRank(item.status);
+      const existRank = getEntityStatusRank(existing.status);
+
+      let chosen = existing;
+      if (incRank > existRank) {
+        chosen = { ...existing, ...item };
+      } else if (incRank === existRank) {
+        const incTime = new Date(item.updatedAt || item.createdAt || 0).getTime();
+        const existTime = new Date(existing.updatedAt || existing.createdAt || 0).getTime();
+        if (incTime >= existTime) {
+          chosen = { ...existing, ...item };
+        }
+      }
+      map.set(idStr, chosen);
+    }
+  }
+
+  return Array.from(map.values());
+}
+
 function getInitialData() {
   try {
     const dataPath = path.resolve(process.cwd(), 'data.json');
@@ -93,7 +163,7 @@ export default async function handler(req, res) {
 
       // Case 1: Partial update { key: "orders", value: [...] }
       if (body.key && validKeys.includes(body.key)) {
-        db[body.key] = body.value;
+        db[body.key] = mergeEntityArrays(body.key, db[body.key], body.value);
         dbVersion += 1;
         lastUpdatedAt = Date.now();
         db.version = dbVersion;
@@ -101,11 +171,11 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: true, key: body.key, version: dbVersion, updatedAt: lastUpdatedAt });
       }
 
-      // Case 2: Full or multi-key update { users: [...], orders: [...] }
+      // Case 2: Multi-key update { users: [...], orders: [...] }
       let updated = false;
       for (const k of validKeys) {
         if (body[k] !== undefined) {
-          db[k] = body[k];
+          db[k] = mergeEntityArrays(k, db[k], body[k]);
           updated = true;
         }
       }
